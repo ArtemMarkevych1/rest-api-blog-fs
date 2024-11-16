@@ -5,7 +5,7 @@ import { signOut } from '../store/reducers/authReducer'
 function Navbar() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { user } = useSelector(state => state.auth)
+  const { user } = useSelector(state => state.autwhh)
 
   const handleSignOut = () => {
     dispatch(signOut())
