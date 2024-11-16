@@ -1,31 +1,34 @@
 import { takeLatest, put, call } from 'redux-saga/effects'
 import { AUTH_ACTIONS } from '../actions/authActions'
 import { authService } from '../../services/api'
+import { 
+  signInSuccess, 
+  signInFailure,
+  signUpSuccess,
+  signUpFailure 
+} from '../reducers/authReducer'
 
 function* signInSaga(action) {
   try {
-    const { credentials, callback } = action.payload
-    const response = yield call(authService.signIn, credentials)
-    
-    // Store the token in localStorage
+    const response = yield call(authService.signIn, action.payload)
     localStorage.setItem('token', response.token)
-    
-    // Dispatch success action with user data
-    yield put({ 
-      type: AUTH_ACTIONS.SIGN_IN_SUCCESS, 
-      payload: response.user 
-    })
-    
-    // Call the callback (navigation)
-    if (callback) callback()
+    yield put(signInSuccess(response.user))
   } catch (error) {
-    yield put({ 
-      type: AUTH_ACTIONS.SIGN_IN_FAILURE, 
-      payload: error.message 
-    })
+    yield put(signInFailure(error.message))
+  }
+}
+
+function* signUpSaga(action) {
+  try {
+    const response = yield call(authService.signUp, action.payload)
+    localStorage.setItem('token', response.token)
+    yield put(signUpSuccess(response.user))
+  } catch (error) {
+    yield put(signUpFailure(error.message))
   }
 }
 
 export function* watchAuth() {
   yield takeLatest(AUTH_ACTIONS.SIGN_IN_REQUEST, signInSaga)
+  yield takeLatest(AUTH_ACTIONS.SIGN_UP_REQUEST, signUpSaga)
 } 

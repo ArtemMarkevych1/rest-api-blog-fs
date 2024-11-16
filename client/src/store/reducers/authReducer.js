@@ -36,6 +36,20 @@ const authSlice = createSlice({
       state.loading = false
       state.error = action.payload
     },
+    signUpRequest: (state) => {
+      state.loading = true
+      state.error = null
+    },
+    signUpSuccess: (state, action) => {
+      state.loading = false
+      state.user = action.payload
+      state.error = null
+      localStorage.setItem('user', JSON.stringify(action.payload))
+    },
+    signUpFailure: (state, action) => {
+      state.loading = false
+      state.error = action.payload
+    },
     signOut: (state) => {
       state.user = null
       state.token = null
@@ -49,6 +63,9 @@ export const {
   signInRequest,
   signInSuccess,
   signInFailure,
+  signUpRequest,
+  signUpSuccess,
+  signUpFailure,
   signOut
 } = authSlice.actions
 
