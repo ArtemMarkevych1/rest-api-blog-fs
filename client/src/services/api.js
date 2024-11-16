@@ -33,19 +33,19 @@ class PostService {
   }
 
   async getPost(postId) {
-    return await axiosInstance.get(`/posts/${postId}`)
+    return await axiosInstance.get(`/post/${postId}`)
   }
 
   async createPost(postData) {
-    return await axiosInstance.post('/posts', postData)
+    return await axiosInstance.post('/post', postData)
   }
 
   async updatePost(postId, postData) {
-    return await axiosInstance.put(`/posts/${postId}`, postData)
+    return await axiosInstance.put(`/post/${postId}`, postData)
   }
 
   async deletePost(postId) {
-    return await axiosInstance.delete(`/posts/${postId}`)
+    return await axiosInstance.delete(`/post/${postId}`)
   }
 }
 
