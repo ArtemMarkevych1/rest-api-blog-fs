@@ -1,19 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-const getUserFromStorage = () => {
-  try {
-    const user = localStorage.getItem('user')
-    return user ? JSON.parse(user) : null
-  } catch (error) {
-    console.error('Error parsing user from localStorage:', error)
-    localStorage.removeItem('user') // Clear invalid data
-    return null
-  }
-}
-
 const initialState = {
-  user: getUserFromStorage(),
-  token: localStorage.getItem('token'),
+  user: null,
+  token: null,
   loading: false,
   error: null
 }
@@ -31,6 +20,7 @@ const authSlice = createSlice({
       state.user = action.payload
       state.error = null
       localStorage.setItem('user', JSON.stringify(action.payload))
+      localStorage.setItem('token', action.payload.token)
     },
     signInFailure: (state, action) => {
       state.loading = false
@@ -45,6 +35,7 @@ const authSlice = createSlice({
       state.user = action.payload
       state.error = null
       localStorage.setItem('user', JSON.stringify(action.payload))
+      localStorage.setItem('token', action.payload.token)
     },
     signUpFailure: (state, action) => {
       state.loading = false

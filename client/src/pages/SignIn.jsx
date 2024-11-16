@@ -1,11 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { signIn } from '../store/actions/authActions'
 
 function SignIn() {
   const dispatch = useDispatch()
-  const { loading, error } = useSelector(state => state.auth)
+  const navigate = useNavigate()
+  const { loading, error, user } = useSelector(state => state.auth)
+
+  useEffect(() => {
+    if (user) {
+      navigate('/')
+    }
+  }, [user, navigate])
 
   const [formData, setFormData] = useState({
     email: '',

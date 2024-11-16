@@ -12,7 +12,8 @@ function* signInSaga(action) {
   try {
     const response = yield call(authService.signIn, action.payload)
     localStorage.setItem('token', response.token)
-    yield put(signInSuccess(response.user))
+    const userData = yield call(authService.getCurrentUser)
+    yield put(signInSuccess({ ...userData, token: response.token }))
   } catch (error) {
     yield put(signInFailure(error.message))
   }
@@ -22,7 +23,8 @@ function* signUpSaga(action) {
   try {
     const response = yield call(authService.signUp, action.payload)
     localStorage.setItem('token', response.token)
-    yield put(signUpSuccess(response.user))
+    const userData = yield call(authService.getCurrentUser)
+    yield put(signUpSuccess({ ...userData, token: response.token }))
   } catch (error) {
     yield put(signUpFailure(error.message))
   }

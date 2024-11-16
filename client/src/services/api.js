@@ -20,6 +20,11 @@ class AuthService {
   signOut() {
     localStorage.removeItem('token')
   }
+
+  async getCurrentUser() {
+    const response = await axiosInstance.get('/auth/current-user')
+    return response.data
+  }
 }
 
 class PostService {
