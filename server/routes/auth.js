@@ -5,8 +5,8 @@ const { signupValidator, validateResult, loginValidator, verifyEmailValidator, v
 const isAuth = require('../middlewares/isAuth');
 
 router.get('/current-user', isAuth, getCurrentUser);
-router.post('/register', signupValidator, validateResult, register);
-router.post('/login', loginValidator, validateResult, login);
+router.post('/signup', signupValidator, validateResult, register);
+router.post('/signin', loginValidator, validateResult, login);
 router.post('/verify-email', verifyEmailValidator, validateResult, verifyEmail);
 router.post('/verify-user', verifyUserValidator, validateResult, verifyUser);
 router.post('/forgot-password', verifyEmailValidator, validateResult, forgotPassword);
