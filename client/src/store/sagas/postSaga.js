@@ -8,9 +8,11 @@ import {
 
 function* fetchPostsSaga() {
   try {
-    const posts = yield call(postService.getPosts)
-    console.log('posts', posts)
-    yield put(fetchPostsSuccess(posts))
+    const response = yield call(postService.getPosts)
+    yield put(fetchPostsSuccess({
+      posts: response.data.posts,
+      pagination: response.data.pagination
+    }))
   } catch (error) {
     yield put(fetchPostsFailure(error.message))
   }
