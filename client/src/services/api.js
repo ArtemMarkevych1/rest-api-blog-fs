@@ -1,29 +1,47 @@
-import axiosInstance from './axiosInstance'
+import axios from 'axios'
+import { isValidCategory } from '../utils'
+
+const API_URL = 'http://localhost:3000/api/v1'
+
+const axiosInstance = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+
+// Add token to requests if it exists
+axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+}, (error) => {
+  return Promise.reject(error)
+})
 
 class AuthService {
-  async signIn(credentials) {
-    const data = await axiosInstance.post('/auth/login', credentials)
-    if (data.token) {
-      localStorage.setItem('token', data.token)
-    }
-    return data
-  }
-
-  async signUp(userData) {
-    const data = await axiosInstance.post('/auth/signup', userData)
-    if (data.token) {
-      localStorage.setItem('token', data.token)
-    }
-    return data
-  }
-
-  signOut() {
-    localStorage.removeItem('token')
-  }
-
   async getCurrentUser() {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      throw new Error('No token found')
+    }
     const response = await axiosInstance.get('/auth/current-user')
     return response.data
+  }
+
+  async signIn(credentials) {
+    const response = await axiosInstance.post('/auth/signin', credentials)
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token)
+    }
+    return response.data
+  }
+
+  async signOut() {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
   }
 }
 
@@ -37,15 +55,27 @@ class PostService {
   }
 
   async createPost(postData) {
+    if (postData.category && !isValidCategory(postData.category)) {
+      throw new Error('Invalid category')
+    }
     return await axiosInstance.post('/post', postData)
-  }
-
-  async updatePost(postId, postData) {
-    return await axiosInstance.put(`/post/${postId}`, postData)
   }
 
   async deletePost(postId) {
     return await axiosInstance.delete(`/post/${postId}`)
+  }
+
+  async getPostsByCategory(category) {
+    const response = await axiosInstance.get(`/posts/category/${category}`)
+    return response.data
+  }
+
+  async updatePost(postId, postData) {
+    if (postData.category && !isValidCategory(postData.category)) {
+      throw new Error('Invalid category')
+    }
+    const response = await axiosInstance.put(`/posts/${postId}`, postData)
+    return response.data
   }
 }
 
@@ -92,4 +122,5 @@ export default {
   ...postService,
   ...userService,
   ...commentService
-} 
+}
+

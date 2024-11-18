@@ -2,6 +2,21 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { signOut } from '../store/reducers/authReducer'
 
+const CATEGORIES = [
+  { id: 'technology', label: 'Technology' },
+  { id: 'lifestyle', label: 'Lifestyle' },
+  { id: 'travel', label: 'Travel' },
+  { id: 'food', label: 'Food' },
+  { id: 'health', label: 'Health' },
+  { id: 'fitness', label: 'Fitness' },
+  { id: 'business', label: 'Business' },
+  { id: 'finance', label: 'Finance' },
+  { id: 'education', label: 'Education' },
+  { id: 'entertainment', label: 'Entertainment' },
+  { id: 'gaming', label: 'Gaming' },
+  { id: 'science', label: 'Science' }
+]
+
 function Navbar() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -12,17 +27,45 @@ function Navbar() {
     navigate('/signin')
   }
 
+  const handleCategorySelect = (categoryId) => {
+    navigate(`/category/${categoryId}`)
+  }
+
   return (
     <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          <div className="flex">
+          <div className="flex items-center">
             <Link to="/" className="flex items-center">
               <svg className="h-8 w-8 text-apple-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2.5 2.5 0 00-2.5-2.5H15" />
               </svg>
               <span className="ml-2 text-xl font-semibold text-gray-900">Blog</span>
             </Link>
+
+            {/* Categories Dropdown */}
+            <div className="relative ml-6 group">
+              <button className="nav-link flex items-center">
+                Categories
+                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <div className="py-1" role="menu">
+                  {CATEGORIES.map(category => (
+                    <button
+                      key={category.id}
+                      onClick={() => handleCategorySelect(category.id)}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      role="menuitem"
+                    >
+                      {category.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="flex items-center space-x-4">

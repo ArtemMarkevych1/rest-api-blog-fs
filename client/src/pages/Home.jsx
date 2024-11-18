@@ -7,6 +7,7 @@ function Home() {
   const dispatch = useDispatch()
   const { posts, loading, error } = useSelector(state => state.posts.posts)
   const { user } = useSelector(state => state.auth)
+  const state = useSelector(state => state)
 
   useEffect(() => {
     dispatch(fetchPosts())
@@ -44,6 +45,8 @@ function Home() {
             </div>
           )}
         </div>
+
+        <pre>{JSON.stringify(state, null, 2)}</pre>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {posts && posts.length > 0 && posts.map(post => (
