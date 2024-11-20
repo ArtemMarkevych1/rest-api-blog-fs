@@ -1,37 +1,38 @@
 const Post = require('../models/Post');
+const { Categories, isValidCategory  } = require('../helpers');
 
 const createPost = async (req, res, next) => {
     try {
-        const { title, content, tags, category } = req.body;
-        const { userId } = req.user;
+        const { title, content, category } = req.body;
+        const {userId} = req.user;
 
-        if (!category) {
+        // Validate category
+        if (category && !isValidCategory(category)) {
             return res.status(400).json({
                 success: false,
-                message: "Category is required"
+                message: `Invalid category. Must be one of: ${Object.values(Categories).join(', ')}`
             });
         }
 
-        const post = await Post.create({
+        const post = new Post({
             title,
             content,
-            createdBy: userId,
-            tags,
-            category
+            category: category || Categories.OTHER,
+            createdBy: userId || null
         });
 
-        const populatedPost = await Post.findById(post._id)
-            .populate('category')
-            .populate('createdBy', '-password');
+        await post.save();
 
         res.status(201).json({
             success: true,
-            message: "Post created successfully",
-            post: populatedPost
+            message: 'Post created successfully',
+            data: post
         });
-
     } catch (error) {
-        next(error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
     }
 };
 

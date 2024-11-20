@@ -1,25 +1,6 @@
 const Category = require('../models/Category');
 const User = require('../models/User');
-
-const Categories = {
-  TECHNOLOGY: 'technology',
-  LIFESTYLE: 'lifestyle',
-  TRAVEL: 'travel',
-  FOOD: 'food',
-  HEALTH: 'health',
-  FITNESS: 'fitness',
-  BUSINESS: 'business',
-  FINANCE: 'finance',
-  EDUCATION: 'education',
-  ENTERTAINMENT: 'entertainment',
-  GAMING: 'gaming',
-  SCIENCE: 'science'
-}
-
-// Helper function to validate category
-const isValidCategory = (category) => {
-  return Object.values(Categories).includes(category)
-}
+const { Categories, isValidCategory } = require('../helpers');
 
 const getAllCategories = async (req, res, next) => {
     try {

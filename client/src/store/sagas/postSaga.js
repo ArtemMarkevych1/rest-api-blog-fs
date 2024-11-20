@@ -1,9 +1,10 @@
 import { takeLatest, put, call } from 'redux-saga/effects'
 import { POST_ACTIONS } from '../actions/postActions'
+
 import { postService } from '../../services/api'
-import { 
-  fetchPostsSuccess, 
-  fetchPostsFailure 
+import {
+  fetchPostsSuccess,
+  fetchPostsFailure
 } from '../reducers/postReducer'
 
 function* fetchPostsSaga() {
@@ -22,6 +23,7 @@ function* createPost(action) {
     try {
         const post = yield call(postService.createPost, action.payload)
         yield put({ type: POST_ACTIONS.CREATE_POST_SUCCESS, payload: post })
+        yield put({ type: POST_ACTIONS.FETCH_POSTS_REQUEST })
     } catch (error) {
         yield put({ type: POST_ACTIONS.CREATE_POST_FAILURE, payload: error.message })
     }
@@ -32,6 +34,7 @@ function* updatePost(action) {
         const { postId, postData } = action.payload
         const post = yield call(postService.updatePost, postId, postData)
         yield put({ type: POST_ACTIONS.UPDATE_POST_SUCCESS, payload: post })
+        yield put({ type: POST_ACTIONS.FETCH_POSTS_REQUEST })
     } catch (error) {
         yield put({ type: POST_ACTIONS.UPDATE_POST_FAILURE, payload: error.message })
     }
@@ -41,6 +44,7 @@ function* deletePost(action) {
     try {
         yield call(postService.deletePost, action.payload)
         yield put({ type: POST_ACTIONS.DELETE_POST_SUCCESS, payload: action.payload })
+        yield put({ type: POST_ACTIONS.FETCH_POSTS_REQUEST })
     } catch (error) {
         yield put({ type: POST_ACTIONS.DELETE_POST_FAILURE, payload: error.message })
     }

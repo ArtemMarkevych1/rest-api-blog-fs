@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { Categories } = require('../helpers');
 
 const postSchema = new mongoose.Schema({
     title: {
@@ -10,15 +11,16 @@ const postSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    category: {
+        type: String,
+        enum: Object.values(Categories),
+        required: true,
+        default: Categories.OTHER
+    },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
-    },
-    category: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Category',
-        required: true
+        required: false
     },
     tags: [{
         type: String,

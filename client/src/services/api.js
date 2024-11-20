@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { isValidCategory } from '../utils'
+import { Categories, isValidCategory } from '../constants/categories'
 
 const API_URL = 'http://localhost:3000/api/v1'
 
@@ -55,10 +55,11 @@ class PostService {
   }
 
   async createPost(postData) {
-    if (postData.category && !isValidCategory(postData.category)) {
+    if (!isValidCategory(postData.category)) {
       throw new Error('Invalid category')
     }
-    return await axiosInstance.post('/post', postData)
+    const response = await axiosInstance.post('/post', postData)
+    return response.data
   }
 
   async deletePost(postId) {
@@ -66,7 +67,10 @@ class PostService {
   }
 
   async getPostsByCategory(category) {
-    const response = await axiosInstance.get(`/posts/category/${category}`)
+    if (!isValidCategory(category)) {
+      throw new Error('Invalid category')
+    }
+    const response = await axiosInstance.get(`/posts/category/${Categories[category]}`)
     return response.data
   }
 

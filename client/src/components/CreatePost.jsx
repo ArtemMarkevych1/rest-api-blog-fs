@@ -1,28 +1,37 @@
 import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { createPost } from '../store/actions/postActions'
+import { Categories } from '../constants/categories'
 
 function CreatePost() {
   const dispatch = useDispatch()
+  const { loading } = useSelector(state => state.posts)
   const [isOpen, setIsOpen] = useState(false)
   const [formData, setFormData] = useState({
     title: '',
     content: '',
+    category: Object.values(Categories)[0],
     image: ''
   })
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault()
     dispatch(createPost(formData))
-    setFormData({ title: '', content: '', image: '' })
-    setIsOpen(false)
-  }
-
-  const handleChange = (e) => {
     setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
+      title: '',
+      content: '',
+      category: '',
+      image: ''
     })
+    setIsOpen(false)
   }
 
   if (!isOpen) {
@@ -41,46 +50,80 @@ function CreatePost() {
 
   return (
     <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full overflow-hidden">
         <form onSubmit={handleSubmit} className="divide-y divide-gray-200">
-          <div className="px-6 py-4">
+          <div className="px-6 py-4 flex justify-between items-center">
             <h3 className="text-lg font-medium text-gray-900">Create New Post</h3>
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              className="text-gray-400 hover:text-gray-500"
+            >
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
-          
-          <div className="px-6 py-4 space-y-4">
+
+          <div className="px-6 py-4 space-y-6">
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                Title
+                Title <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 name="title"
                 id="title"
+                required
                 value={formData.title}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                required
+                placeholder="Enter post title"
               />
             </div>
 
             <div>
+              <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+                Category <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="category"
+                name="category"
+                required
+                value={formData.category}
+                onChange={handleChange}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              >
+                {Object.values(Categories).map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-xs text-gray-500">
+                Current category: {formData.category}
+              </p>
+            </div>
+
+            <div>
               <label htmlFor="content" className="block text-sm font-medium text-gray-700">
-                Content
+                Content <span className="text-red-500">*</span>
               </label>
               <textarea
-                name="content"
                 id="content"
-                rows={4}
+                name="content"
+                required
+                rows={6}
                 value={formData.content}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                required
+                placeholder="Write your post content here..."
               />
             </div>
 
             <div>
               <label htmlFor="image" className="block text-sm font-medium text-gray-700">
-                Image URL (optional)
+                Image URL (Optional)
               </label>
               <input
                 type="url"
@@ -89,7 +132,18 @@ function CreatePost() {
                 value={formData.image}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                placeholder="https://example.com/image.jpg"
               />
+              {formData.image && (
+                <div className="mt-2">
+                  <img
+                    src={formData.image}
+                    alt="Preview"
+                    className="h-32 w-auto object-cover rounded-md"
+                    onError={(e) => e.target.style.display = 'none'}
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -103,9 +157,20 @@ function CreatePost() {
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 border border-transparent rounded-md hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              disabled={loading}
+              className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
-              Create Post
+              {loading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Creating...
+                </>
+              ) : (
+                'Create Post'
+              )}
             </button>
           </div>
         </form>
