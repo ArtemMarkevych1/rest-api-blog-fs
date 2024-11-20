@@ -37,7 +37,7 @@ const postSlice = createSlice({
     },
     createPostSuccess: (state, action) => {
       state.loading = false
-      state.items = [action.payload, ...state.items]
+      state.items.unshift(action.payload)
     },
     createPostFailure: (state, action) => {
       state.loading = false

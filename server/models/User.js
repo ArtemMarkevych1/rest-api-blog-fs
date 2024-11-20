@@ -15,8 +15,7 @@ const userSchema = new mongoose.Schema({
         lowercase: true
     },
     profilePicture: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'File',
+        type: String,
         default: null
     },
     password: {
@@ -25,8 +24,7 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: Number,
-        enum: [1, 2, 3],
-        default: 3,
+        default: 0,
         required: true
     },
     verificationCode: {
@@ -38,9 +36,18 @@ const userSchema = new mongoose.Schema({
     },
     forgotPasswordCode: {
         type: String,
-    },
+    }
 }, {
-    timestamps: true
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+});
+
+// Virtual for user's posts
+userSchema.virtual('posts', {
+    ref: 'Post',
+    localField: '_id',
+    foreignField: 'createdBy'
 });
 
 module.exports = mongoose.model('User', userSchema);

@@ -78,7 +78,7 @@ class PostService {
     if (postData.category && !isValidCategory(postData.category)) {
       throw new Error('Invalid category')
     }
-    const response = await axiosInstance.put(`/posts/${postId}`, postData)
+    const response = await axiosInstance.put(`/post/${postId}`, postData)
     return response.data
   }
 }

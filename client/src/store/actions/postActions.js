@@ -1,7 +1,5 @@
 import { 
   fetchPostsRequest,
-  fetchPostsSuccess,
-  fetchPostsFailure,
   createPostRequest,
   updatePostRequest,
   deletePostRequest,

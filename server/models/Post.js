@@ -20,14 +20,17 @@ const postSchema = new mongoose.Schema({
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: false
+        required: true,
+        index: true
     },
-    tags: [{
+    image: {
         type: String,
-        trim: true
-    }]
+        default: null
+    }
 }, {
     timestamps: true
 });
+
+postSchema.index({ createdBy: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Post', postSchema);

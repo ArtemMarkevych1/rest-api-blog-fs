@@ -4,7 +4,14 @@ const { Categories, isValidCategory  } = require('../helpers');
 const createPost = async (req, res, next) => {
     try {
         const { title, content, category } = req.body;
-        const {userId} = req.user;
+
+        // Check if user exists in request (set by auth middleware)
+        if (!req.user || !req.user._id) {
+            return res.status(401).json({
+                success: false,
+                message: 'User not authenticated'
+            });
+        }
 
         // Validate category
         if (category && !isValidCategory(category)) {
@@ -18,20 +25,24 @@ const createPost = async (req, res, next) => {
             title,
             content,
             category: category || Categories.OTHER,
-            createdBy: userId || null
+            createdBy: req.user._id
         });
 
         await post.save();
 
+        const populatedPost = await Post.findById(post._id)
+            .populate('createdBy', 'username profilePicture');
+
         res.status(201).json({
             success: true,
             message: 'Post created successfully',
-            data: post
+            data: populatedPost
         });
     } catch (error) {
+        console.error('Create post error:', error);
         res.status(500).json({
             success: false,
-            message: error.message
+            message: error.message || 'Error creating post'
         });
     }
 };
@@ -101,12 +112,13 @@ const getPostById = async (req, res, next) => {
 const updatePost = async (req, res, next) => {
     try {
         const { postId } = req.params;
-        const { title, content, tags } = req.body;
+        const { title, content, tags, category } = req.body;
 
         const post = await Post.findByIdAndUpdate(postId, {
             title,
             content,
             tags,
+            category: category || Categories.OTHER
         });
 
         if (!post) {

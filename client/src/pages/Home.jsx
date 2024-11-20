@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { fetchPosts, deletePost, updatePost } from '../store/actions/postActions'
 import CreatePost from '../components/CreatePost'
 import DeleteConfirmModal from '../components/DeleteConfirmModal'
+import EditPostModal from '../components/EditPostModal'
 
 function Home() {
   const dispatch = useDispatch()
@@ -12,6 +13,10 @@ function Home() {
     isOpen: false,
     postId: null,
     postTitle: ''
+  })
+  const [editModal, setEditModal] = useState({
+    isOpen: false,
+    post: null
   })
 
   useEffect(() => {
@@ -35,6 +40,13 @@ function Home() {
 
   const handleDeleteCancel = () => {
     setDeleteModal({ isOpen: false, postId: null, postTitle: '' })
+  }
+
+  const handleEditClick = (post) => {
+    setEditModal({
+      isOpen: true,
+      post: post
+    })
   }
 
   if (loading) {
@@ -63,6 +75,12 @@ function Home() {
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
         title={deleteModal.postTitle}
+      />
+
+      <EditPostModal
+        isOpen={editModal.isOpen}
+        onClose={() => setEditModal({ isOpen: false, post: null })}
+        post={editModal.post}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -123,7 +141,7 @@ function Home() {
                       Delete
                     </button>
                     <button
-                      onClick={() => dispatch(updatePost(post._id, post))}
+                      onClick={() => handleEditClick(post)}
                       className="flex-1 px-4 py-2 text-sm text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors duration-300"
                     >
                       Edit

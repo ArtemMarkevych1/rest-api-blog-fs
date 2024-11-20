@@ -10,7 +10,7 @@ function CreatePost() {
   const [formData, setFormData] = useState({
     title: '',
     content: '',
-    category: Object.values(Categories)[0],
+    category: 'Technology',
     image: ''
   })
 
@@ -24,11 +24,24 @@ function CreatePost() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    dispatch(createPost(formData))
+    console.log('Submitting form data:', {
+      title: formData.title,
+      content: formData.content,
+      category: formData.category,
+      image: formData.image
+    })
+    
+    dispatch(createPost({
+      title: formData.title,
+      content: formData.content,
+      category: formData.category,
+      image: formData.image
+    }))
+    
     setFormData({
       title: '',
       content: '',
-      category: '',
+      category: 'Technology',
       image: ''
     })
     setIsOpen(false)

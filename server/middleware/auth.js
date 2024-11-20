@@ -15,6 +15,7 @@ exports.protect = async (req, res, next) => {
 
     // 2. Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    console.log('Decoded token:', decoded) // Debug log
 
     // 3. Find user and attach to request
     const user = await User.findById(decoded.userId)
@@ -28,9 +29,11 @@ exports.protect = async (req, res, next) => {
 
     // 4. Attach user to request object
     req.user = user
+    console.log('User attached to request:', req.user) // Debug log
 
     next()
   } catch (error) {
+    console.error('Auth middleware error:', error)
     return res.status(401).json({
       success: false,
       message: 'Not authorized, token failed'

@@ -4,6 +4,7 @@ const comparePasswords = require('../utils/comparePasswords');
 const generateCode = require('../utils/generateCode');
 const sendEmail = require('../utils/sendEmail');
 const hashPassword = require('../utils/hashPassword');
+const Post = require('../models/Post');
 
 const register = async (req, res, next) => {
     try {
@@ -254,7 +255,10 @@ const updateUser = async (req, res, next) => {
         const { userId } = req.user;
         const { username, email, profilePicture } = req.body;
         const user = await User.findById(userId)
-            .select('-password -verificationCode -forgotPasswordCode -isVerified');
+            // .select('-password -verificationCode -forgotPasswordCode -isVerified');
+
+            // todo
+            // .select('-password -forgotPasswordCode -isVerified');
 
         if (!user) {
             return res.status(404).json({
@@ -310,32 +314,45 @@ const updateUser = async (req, res, next) => {
             message: "User updated successfully"
         });
     } catch (error) {
-        console.log("---suka");
         next(error);
     }
 }
 
-const getCurrentUser = async (req, res, next) => {
+const getCurrentUser = async (req, res) => {
     try {
-        const { userId } = req.user;
-        const user = await User.findById(userId)
-            .select('-password -verificationCode -forgotPasswordCode -isVerified')
-            .populate('profilePicture');
+        // Get user without posts first
+        const user = await User.findById(req.user._id)
+            .select('-password');
 
         if (!user) {
             return res.status(404).json({
                 success: false,
-                message: "User not found"
+                message: 'User not found'
             });
         }
 
-        res.status(200).json({
+        // Separately fetch only posts created by this user
+        const userPosts = await Post.find({ createdBy: user._id })
+            .sort('-createdAt')
+            .populate('createdBy', 'username profilePicture');
+
+        // Combine user data with their posts
+        const userData = {
+            ...user.toObject(),
+            posts: userPosts
+        };
+
+        res.json({
             success: true,
-            message: "User fetched successfully",
-            data: user
+            message: 'User fetched successfully',
+            data: userData
         });
     } catch (error) {
-        next(error);
+        console.error('Get current user error:', error);
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Error fetching user data'
+        });
     }
 }
 
