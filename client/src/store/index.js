@@ -2,50 +2,53 @@ import { configureStore } from '@reduxjs/toolkit'
 import createSagaMiddleware from 'redux-saga'
 import rootReducer from './reducers'
 import rootSaga from './sagas'
-import { authService } from '../services/api'
-import { signInSuccess } from './reducers/authReducer'
 
 const sagaMiddleware = createSagaMiddleware()
 
-// Initialize store with async function
-const initializeStore = async () => {
-  let preloadedState = {
-    auth: {
+// Get initial auth state from localStorage
+const getUserFromStorage = () => {
+  try {
+    const user = localStorage.getItem('user')
+    const token = localStorage.getItem('token')
+    return {
+      user: user ? JSON.parse(user) : null,
+      token: token || null,
+      loading: false,
+      error: null
+    }
+  } catch (error) {
+    localStorage.removeItem('user')
+    localStorage.removeItem('token')
+    return {
       user: null,
       token: null,
       loading: false,
       error: null
     }
   }
-
-  // Try to get current user if token exists
-  const token = localStorage.getItem('token')
-  if (token) {
-    try {
-      const userData = await authService.getCurrentUser()
-      preloadedState.auth = {
-        user: userData,
-        token,
-        loading: false,
-        error: null
-      }
-    } catch (error) {
-      console.error('Failed to fetch user data:', error)
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-    }
-  }
-
-  const store = configureStore({
-    reducer: rootReducer,
-    preloadedState,
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware({ thunk: false }).concat(sagaMiddleware),
-    devTools: process.env.NODE_ENV !== 'production',
-  })
-
-  sagaMiddleware.run(rootSaga)
-  return store
 }
 
-export default initializeStore 
+// Create store with preloaded auth state
+const store = configureStore({
+  reducer: rootReducer,
+  preloadedState: {
+    auth: getUserFromStorage()
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ thunk: false }).concat(sagaMiddleware),
+  devTools: import.meta.env.MODE !== 'production',
+})
+
+// Run saga middleware once
+sagaMiddleware.run(rootSaga)
+
+// Only dispatch initializeAuth if we have a token but no user
+const token = localStorage.getItem('token')
+if (token && !store.getState().auth.user) {
+  store.dispatch({ 
+    type: 'auth/initializeAuth', 
+    payload: { token } 
+  })
+}
+
+export default store 

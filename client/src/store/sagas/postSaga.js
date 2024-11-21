@@ -1,10 +1,15 @@
 import { takeLatest, put, call } from 'redux-saga/effects'
 import { POST_ACTIONS } from '../actions/postActions'
-
 import { postService } from '../../services/api'
 import {
   fetchPostsSuccess,
-  fetchPostsFailure
+  fetchPostsFailure,
+  createPostSuccess,
+  createPostFailure,
+  updatePostSuccess,
+  updatePostFailure,
+  deletePostSuccess,
+  deletePostFailure
 } from '../reducers/postReducer'
 
 function* fetchPostsSaga() {
@@ -21,32 +26,29 @@ function* fetchPostsSaga() {
 
 function* createPost(action) {
     try {
-        const post = yield call(postService.createPost, action.payload)
-        yield put({ type: POST_ACTIONS.CREATE_POST_SUCCESS, payload: post })
-        yield put({ type: POST_ACTIONS.FETCH_POSTS_REQUEST })
+        const response = yield call(postService.createPost, action.payload)
+        yield put(createPostSuccess(response.data))
     } catch (error) {
-        yield put({ type: POST_ACTIONS.CREATE_POST_FAILURE, payload: error.message })
+        yield put(createPostFailure(error.message))
     }
 }
 
 function* updatePost(action) {
     try {
         const { postId, postData } = action.payload
-        const post = yield call(postService.updatePost, postId, postData)
-        yield put({ type: POST_ACTIONS.UPDATE_POST_SUCCESS, payload: post })
-        yield put({ type: POST_ACTIONS.FETCH_POSTS_REQUEST })
+        const response = yield call(postService.updatePost, postId, postData)
+        yield put(updatePostSuccess(response.data))
     } catch (error) {
-        yield put({ type: POST_ACTIONS.UPDATE_POST_FAILURE, payload: error.message })
+        yield put(updatePostFailure(error.message))
     }
 }
 
 function* deletePost(action) {
     try {
         yield call(postService.deletePost, action.payload)
-        yield put({ type: POST_ACTIONS.DELETE_POST_SUCCESS, payload: action.payload })
-        yield put({ type: POST_ACTIONS.FETCH_POSTS_REQUEST })
+        yield put(deletePostSuccess(action.payload))
     } catch (error) {
-        yield put({ type: POST_ACTIONS.DELETE_POST_FAILURE, payload: error.message })
+        yield put(deletePostFailure(error.message))
     }
 }
 
@@ -60,7 +62,7 @@ function* fetchUserPosts(action) {
 }
 
 export function* watchPosts() {
-    yield takeLatest('posts/fetchPostsRequest', fetchPostsSaga)
+    yield takeLatest(POST_ACTIONS.FETCH_POSTS_REQUEST, fetchPostsSaga)
     yield takeLatest(POST_ACTIONS.CREATE_POST_REQUEST, createPost)
     yield takeLatest(POST_ACTIONS.UPDATE_POST_REQUEST, updatePost)
     yield takeLatest(POST_ACTIONS.DELETE_POST_REQUEST, deletePost)

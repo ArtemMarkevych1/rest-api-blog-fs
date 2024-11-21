@@ -47,7 +47,14 @@ class AuthService {
 
 class PostService {
   async getPosts() {
-    return await axiosInstance.get('/post')
+    const response = await axiosInstance.get('/post', {
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    })
+    return response
   }
 
   async getPost(postId) {

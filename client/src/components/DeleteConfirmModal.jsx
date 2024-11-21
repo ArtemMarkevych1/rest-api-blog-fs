@@ -1,4 +1,4 @@
-import React from 'react'
+import PropTypes from 'prop-types'
 
 function DeleteConfirmModal({ isOpen, onClose, onConfirm, title }) {
   if (!isOpen) return null
@@ -20,7 +20,7 @@ function DeleteConfirmModal({ isOpen, onClose, onConfirm, title }) {
           </h3>
           
           <p className="text-sm text-gray-500 text-center mb-6">
-            Are you sure you want to delete "{title}"? This action cannot be undone.
+            Are you sure you want to delete {title}? This action cannot be undone.
           </p>
 
           <div className="flex justify-end space-x-3">
@@ -46,3 +46,10 @@ function DeleteConfirmModal({ isOpen, onClose, onConfirm, title }) {
 }
 
 export default DeleteConfirmModal 
+
+DeleteConfirmModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onConfirm: PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired
+}

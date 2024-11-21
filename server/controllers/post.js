@@ -1,5 +1,5 @@
 const Post = require('../models/Post');
-const { Categories, isValidCategory  } = require('../helpers');
+const { Categories, isValidCategory } = require('../helpers');
 
 const createPost = async (req, res, next) => {
     try {
@@ -53,13 +53,13 @@ const getAllPosts = async (req, res, next) => {
         const page = parseInt(req.query.page) || 1;
         const size = parseInt(req.query.size) || 10;
         const skip = (page - 1) * size;
-        
+
         let query = {};
-        
+
         if (category) {
             query.category = category;
         }
-        
+
         const totalCount = await Post.countDocuments(query);
         const totalPages = Math.ceil(totalCount / size);
 
@@ -69,6 +69,14 @@ const getAllPosts = async (req, res, next) => {
             .skip(skip)
             .limit(size)
             .sort({ createdAt: -1 });
+
+        // Add headers to prevent caching
+        res.set({
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+            'Surrogate-Control': 'no-store'
+        });
 
         res.status(200).json({
             success: true,

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { updatePost } from '../store/actions/postActions'
 import { Categories } from '../constants/categories'
+import PropTypes from 'prop-types'
 
 function EditPostModal({ isOpen, onClose, post }) {
   const dispatch = useDispatch()
@@ -163,3 +164,9 @@ function EditPostModal({ isOpen, onClose, post }) {
 }
 
 export default EditPostModal 
+
+EditPostModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  post: PropTypes.object.isRequired
+}
