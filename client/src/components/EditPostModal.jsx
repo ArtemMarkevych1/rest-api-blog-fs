@@ -35,7 +35,12 @@ function EditPostModal({ isOpen, onClose, post }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    dispatch(updatePost(post._id, formData))
+    if (!post?._id) return
+
+    dispatch(updatePost({
+      id: post._id,
+      data: formData
+    }))
     onClose()
   }
 
@@ -163,10 +168,10 @@ function EditPostModal({ isOpen, onClose, post }) {
   )
 }
 
-export default EditPostModal 
+export default EditPostModal
 
 EditPostModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  post: PropTypes.object.isRequired
-}
+  post: PropTypes.object,
+} 

@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 
 function DeleteConfirmModal({ isOpen, onClose, onConfirm, title }) {
+
   if (!isOpen) return null
 
   return (
@@ -14,11 +15,11 @@ function DeleteConfirmModal({ isOpen, onClose, onConfirm, title }) {
               </svg>
             </div>
           </div>
-          
+
           <h3 className="text-lg font-medium text-gray-900 text-center mb-2">
             Delete Post
           </h3>
-          
+
           <p className="text-sm text-gray-500 text-center mb-6">
             Are you sure you want to delete {title}? This action cannot be undone.
           </p>
@@ -45,11 +46,11 @@ function DeleteConfirmModal({ isOpen, onClose, onConfirm, title }) {
   )
 }
 
-export default DeleteConfirmModal 
+export default DeleteConfirmModal
 
 DeleteConfirmModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onConfirm: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired
+  title: PropTypes.string.isRequired,
 }

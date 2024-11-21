@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchPosts, deletePost } from '../store/actions/postActions'
+import { fetchPosts, deletePost, updatePost } from '../store/actions/postActions'
 import CreatePost from '../components/CreatePost'
 import DeleteConfirmModal from '../components/DeleteConfirmModal'
 import EditPostModal from '../components/EditPostModal'
@@ -10,44 +10,38 @@ function Home() {
   const dispatch = useDispatch()
   const { items: posts, loading, error } = useSelector(state => state.posts)
   const { user } = useSelector(state => state.auth)
-  const [deleteModal, setDeleteModal] = useState({
-    isOpen: false,
-    postId: null,
-    postTitle: ''
-  })
-  const [editModal, setEditModal] = useState({
-    isOpen: false,
-    post: null
-  })
+
+  const [post, setPost] = useState(null)
+  const [deleteModal, setDeleteModal] = useState(false)
+  const [editModal, setEditModal] = useState(false)
 
   useEffect(() => {
     dispatch(fetchPosts())
   }, [dispatch])
 
   const handleDeleteClick = (post) => {
-    setDeleteModal({
-      isOpen: true,
-      postId: post._id,
-      postTitle: post.title
-    })
+    setPost(post)
+    setDeleteModal(true)
   }
 
-  const handleDeleteConfirm = () => {
-    if (deleteModal.postId) {
-      dispatch(deletePost(deleteModal.postId))
-      setDeleteModal({ isOpen: false, postId: null, postTitle: '' })
+  const handleDeleteConfirm = (post) => {
+    if (post) {
+      dispatch(deletePost(post._id))
+      setDeleteModal(false)
     }
   }
 
   const handleDeleteCancel = () => {
-    setDeleteModal({ isOpen: false, postId: null, postTitle: '' })
+    setDeleteModal(false)
   }
 
   const handleEditClick = (post) => {
-    setEditModal({
-      isOpen: true,
-      post: post
-    })
+    setPost(post)
+    setEditModal(true)
+  }
+
+  const handleEditCancel = () => {
+    setEditModal(false)
   }
 
   if (loading) {
@@ -72,16 +66,16 @@ function Home() {
   return (
     <div className="min-h-screen bg-gray-50">
       <DeleteConfirmModal
-        isOpen={deleteModal.isOpen}
+        isOpen={deleteModal}
         onClose={handleDeleteCancel}
-        onConfirm={handleDeleteConfirm}
-        title={deleteModal.postTitle}
+        onConfirm={() => handleDeleteConfirm(post)}
+        title={"Are you sure you want to delete this post?"}
       />
 
       <EditPostModal
-        isOpen={editModal.isOpen}
-        onClose={() => setEditModal({ isOpen: false, post: null })}
-        post={editModal.post}
+        isOpen={editModal}
+        onClose={handleEditCancel}
+        post={post}
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -104,7 +98,6 @@ function Home() {
               onEdit={() => handleEditClick(post)}
               onDelete={() => handleDeleteClick(post)}
             />
-
           ))}
         </div>
       </div>

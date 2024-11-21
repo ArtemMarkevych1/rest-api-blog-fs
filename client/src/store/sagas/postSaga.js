@@ -9,7 +9,10 @@ import {
   updatePostSuccess,
   updatePostFailure,
   deletePostSuccess,
-  deletePostFailure
+  deletePostFailure,
+  fetchUserPostsSuccess,
+  fetchUserPostsFailure,
+  fetchPostsRequest
 } from '../reducers/postReducer'
 
 function* fetchPostsSaga() {
@@ -35,9 +38,10 @@ function* createPost(action) {
 
 function* updatePost(action) {
     try {
-        const { postId, postData } = action.payload
-        const response = yield call(postService.updatePost, postId, postData)
+        const { id, data } = action.payload
+        const response = yield call(postService.updatePost, id, data)
         yield put(updatePostSuccess(response.data))
+        yield put(fetchPostsRequest())
     } catch (error) {
         yield put(updatePostFailure(error.message))
     }
@@ -54,10 +58,10 @@ function* deletePost(action) {
 
 function* fetchUserPosts(action) {
     try {
-        const posts = yield call(postService.getUserPosts, action.payload)
-        yield put({ type: POST_ACTIONS.FETCH_USER_POSTS_SUCCESS, payload: posts })
+        const response = yield call(postService.getUserPosts, action.payload)
+        yield put(fetchUserPostsSuccess(response.data))
     } catch (error) {
-        yield put({ type: POST_ACTIONS.FETCH_USER_POSTS_FAILURE, payload: error.message })
+        yield put(fetchUserPostsFailure(error.message))
     }
 }
 

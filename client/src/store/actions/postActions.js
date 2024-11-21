@@ -1,10 +1,8 @@
 import { 
   fetchPostsRequest,
   createPostRequest,
-  updatePostRequest,
   deletePostRequest,
-  fetchUserPostsRequest
-} from '../reducers/postReducer'
+  fetchUserPostsRequest} from '../reducers/postReducer'
 
 // Define action types that match the slice action types
 export const POST_ACTIONS = {
@@ -33,9 +31,10 @@ export const createPost = (postData) => {
   return createPostRequest(postData)
 }
 
-export const updatePost = (postId, postData) => {
-  return updatePostRequest({ postId, postData })
-}
+export const updatePost = (payload) => ({
+  type: POST_ACTIONS.UPDATE_POST_REQUEST,
+  payload
+})
 
 export const deletePost = (postId) => {
   return deletePostRequest(postId)
