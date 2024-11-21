@@ -43,15 +43,17 @@ const postSlice = createSlice({
       state.loading = false
       state.error = action.payload
     },
-    updatePostRequest: (state) => {
+    updatePostRequest: (state, action) => {
       state.loading = true
       state.error = null
     },
     updatePostSuccess: (state, action) => {
       state.loading = false
-      const index = state.items.findIndex(post => post._id === action.payload._id)
-      if (index !== -1) {
-        state.items[index] = action.payload
+      if (action.payload && action.payload._id) {
+        const index = state.items.findIndex(post => post._id === action.payload._id)
+        if (index !== -1) {
+          state.items[index] = action.payload
+        }
       }
     },
     updatePostFailure: (state, action) => {
