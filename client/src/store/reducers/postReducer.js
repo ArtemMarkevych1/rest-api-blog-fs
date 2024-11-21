@@ -43,7 +43,7 @@ const postSlice = createSlice({
       state.loading = false
       state.error = action.payload
     },
-    updatePostRequest: (state, action) => {
+    updatePostRequest: (state) => {
       state.loading = true
       state.error = null
     },
