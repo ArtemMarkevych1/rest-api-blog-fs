@@ -43,7 +43,7 @@ function Navbar() {
       category: categoryId,
       page: 1 // Reset to first page when changing category
     }));
-  };
+  }
 
   useEffect(() => {
     const categoryFromUrl = searchParams.get('category');
