@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { updateUser } from '../store/actions/userActions'
 
-const EditProfileModal = ({ isOpen, onClose, refreshProfile, profile }) => {
+const EditProfileModal = ({ isOpen, onClose, profile }) => {
     const dispatch = useDispatch()
     const { loading } = useSelector(state => state.posts)
     const [formData, setFormData] = useState({
@@ -17,25 +17,33 @@ const EditProfileModal = ({ isOpen, onClose, refreshProfile, profile }) => {
             setFormData({
                 username: profile.username || '',
                 email: profile.email || '',
-                profilePicture: profile.image || ''
+                profilePicture: profile.profilePicture || ''
             })
         }
     }, [profile])
 
-    const handleChange = (e) => {
-        const { name, value } = e.target
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }))
-    }
-
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
-        if (!profile?._id) return
-        dispatch(updateUser(formData))
-        refreshProfile()
-        onClose()
+        
+        // Create object with only changed fields
+        const changedFields = {}
+        if (formData.username !== profile.username) {
+            changedFields.username = formData.username
+        }
+        if (formData.email !== profile.email) {
+            changedFields.email = formData.email
+        }
+        if (formData.profilePicture !== profile.profilePicture) {
+            changedFields.profilePicture = formData.profilePicture
+        }
+
+        // Only dispatch if there are changes
+        if (Object.keys(changedFields).length > 0) {
+            dispatch(updateUser(changedFields))
+            onClose()
+        } else {
+            onClose()
+        }
     }
 
     if (!isOpen) return null
@@ -71,7 +79,7 @@ const EditProfileModal = ({ isOpen, onClose, refreshProfile, profile }) => {
                                 id="username"
                                 required
                                 value={formData.username}
-                                onChange={handleChange}
+                                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                             />
                         </div>
@@ -86,7 +94,7 @@ const EditProfileModal = ({ isOpen, onClose, refreshProfile, profile }) => {
                                 name="email"
                                 id="email"
                                 value={formData.email}
-                                onChange={handleChange}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                             />
                         </div>
@@ -100,14 +108,14 @@ const EditProfileModal = ({ isOpen, onClose, refreshProfile, profile }) => {
                                 type="url"
                                 name="image"
                                 id="image"
-                                value={formData.image}
-                                onChange={handleChange}
+                                value={formData.profilePicture}
+                                onChange={(e) => setFormData({ ...formData, profilePicture: e.target.value })}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                             />
-                            {formData.image && (
+                            {formData.profilePicture && (
                                 <div className="mt-2">
                                     <img
-                                        src={formData.image}
+                                        src={formData.profilePicture}
                                         alt="Preview"
                                         className="h-32 w-auto object-cover rounded-md"
                                         onError={(e) => e.target.style.display = 'none'}

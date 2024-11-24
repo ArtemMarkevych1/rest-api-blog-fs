@@ -5,7 +5,8 @@ import {
   fetchUserProfileSuccess, 
   fetchUserProfileFailure,
   updateUserSuccess,
-  updateUserFailure
+  updateUserFailure,
+  fetchUserProfileRequest
 } from '../reducers/userReducer'
 
 function* fetchUserProfileSaga() {
@@ -21,6 +22,7 @@ function* updateUserSaga(action) {
   try {
     const response = yield call(userService.updateUser, action.payload)
     yield put(updateUserSuccess(response.data))
+    yield put(fetchUserProfileRequest())
   } catch (error) {
     yield put(updateUserFailure(error.message))
   }
