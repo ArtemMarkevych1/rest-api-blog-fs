@@ -6,28 +6,39 @@ const API_URL = 'http://localhost:3000/api/v1'
 const axiosInstance = axios.create({
   baseURL: API_URL,
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'Cache-Control': 'no-cache',
+    'Pragma': 'no-cache',
+    'Expires': '0'
   }
 })
 
-// Add token to requests if it exists
 axiosInstance.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
+  
+  // Add timestamp to prevent caching
+  if (config.method === 'get') {
+    config.params = {
+      ...config.params,
+      _t: Date.now()
+    }
+  }
+  
   return config
-}, (error) => {
-  return Promise.reject(error)
 })
 
 class AuthService {
   async getCurrentUser() {
-    const token = localStorage.getItem('token')
-    if (!token) {
-      throw new Error('No token found')
-    }
-    const response = await axiosInstance.get('/auth/current-user')
+    const response = await axiosInstance.get('/auth/current-user', {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    })
     return response.data
   }
 
