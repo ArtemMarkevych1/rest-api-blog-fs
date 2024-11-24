@@ -53,7 +53,7 @@ function PostCard({ post, onEdit, onDelete }) {
           </span>
         </div>
 
-        {user && user._id === post.createdBy?._id && (
+        {user && user.data._id === post.createdBy?._id && (
           <div className="mt-4 flex space-x-3">
             <button
               onClick={() => onDelete?.(post)}
