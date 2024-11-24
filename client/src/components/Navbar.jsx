@@ -1,7 +1,8 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { signOut } from '../store/reducers/authReducer'
-import { fetchPosts } from '../store/actions/postActions'
+import { setCurrentCategory, fetchPostsRequest } from '../store/reducers/postReducer'
+import { useEffect } from 'react'
 
 const CATEGORIES = [
   { id: 'technology', label: 'Technology' },
@@ -19,8 +20,9 @@ const CATEGORIES = [
 ]
 
 function Navbar() {
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { profile } = useSelector(state => state.user)
 
   const { username } = profile || {}
@@ -30,8 +32,29 @@ function Navbar() {
   }
 
   const handleCategorySelect = (categoryId) => {
-    dispatch(fetchPosts({ category: categoryId }))
-  }
+    // Update URL with selected category
+    setSearchParams({ category: categoryId, page: '1' });
+    
+    // Update Redux state
+    dispatch(setCurrentCategory(categoryId));
+    
+    // Fetch posts with new category
+    dispatch(fetchPostsRequest({ 
+      category: categoryId,
+      page: 1 // Reset to first page when changing category
+    }));
+  };
+
+  useEffect(() => {
+    const categoryFromUrl = searchParams.get('category');
+    if (categoryFromUrl) {
+      dispatch(setCurrentCategory(categoryFromUrl));
+      dispatch(fetchPostsRequest({ 
+        category: categoryFromUrl,
+        page: parseInt(searchParams.get('page')) || 1
+      }));
+    }
+  }, [dispatch, searchParams]);
 
   return (
     <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200">

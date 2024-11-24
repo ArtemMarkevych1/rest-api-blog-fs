@@ -48,24 +48,35 @@ class AuthService {
 
 class PostService {
 
-  async getPosts(queryParams = {}) {
-    try {
-      // Convert queryParams to URLSearchParams
-      const params = new URLSearchParams()
-      
-      // Add all query parameters
-      Object.entries(queryParams).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
-          params.append(key, value)
-        }
-      })
+  async getPosts(params = {}) {
+    const {
+      page = 1,
+      size = 10,
+      category
+    } = params;
+  
+    // Build query parameters
+    const queryParams = new URLSearchParams();
 
-      const response = await axiosInstance.get(`/post?${params.toString()}`)
-      return response
-    } catch (error) {
-      console.error('Error fetching posts:', error)
-      throw error
+    if (category) queryParams.append('category', category);
+    if (page) queryParams.append('page', page.toString());
+    if (size) queryParams.append('size', size.toString());
+      const response = await axiosInstance.get(`/post?${queryParams.toString()}`, {
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
+  
+    return response.data;
+  }
+
+  async getPostsByCategory(category) {
+    if (!isValidCategory(category)) {
+      throw new Error('Invalid category')
     }
+    return await axiosInstance.get(`/posts/category/${Categories[category]}`)
   }
 
   async getPost(postId) {

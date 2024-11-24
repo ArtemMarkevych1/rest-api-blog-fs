@@ -15,17 +15,17 @@ import {
   fetchPostsRequest
 } from '../reducers/postReducer'
 
-function* fetchPostsSaga() {
-  try {
-    const response = yield call(postService.getPosts)
-    yield put(fetchPostsSuccess({
-      posts: response.data.posts,
-      pagination: response.data.pagination
-    }))
-  } catch (error) {
-    yield put(fetchPostsFailure(error.message))
+function* fetchPostsSaga(action) {
+    try {
+      const response = yield call(postService.getPosts, action.payload); // Pass query params
+      yield put(fetchPostsSuccess({
+        posts: response.data.posts,
+        pagination: response.data.pagination
+      }))
+    } catch (error) {
+      yield put(fetchPostsFailure(error.message));
+    }
   }
-}
 
 function* createPost(action) {
     try {

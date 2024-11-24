@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   items: [],
@@ -10,6 +10,7 @@ const initialState = {
     hasNext: false,
     hasPrev: false
   },
+  currentCategory: null,
   loading: false,
   error: null
 }
@@ -30,6 +31,9 @@ const postSlice = createSlice({
     fetchPostsFailure: (state, action) => {
       state.loading = false
       state.error = action.payload
+    },
+    setCurrentCategory: (state, action) => {
+      state.currentCategory = action.payload;
     },
     createPostRequest: (state) => {
       state.loading = true
@@ -92,6 +96,7 @@ export const {
   fetchPostsRequest,
   fetchPostsSuccess,
   fetchPostsFailure,
+  setCurrentCategory,
   createPostRequest,
   createPostSuccess,
   createPostFailure,
