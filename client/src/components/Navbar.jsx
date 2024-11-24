@@ -20,10 +20,9 @@ const CATEGORIES = [
 function Navbar() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { user } = useSelector(state => state.auth)
+  const { profile } = useSelector(state => state.user)
 
-  const { username } = user?.data || {}
-
+  const { username } = profile || {}
   const handleSignOut = () => {
     dispatch(signOut())
     navigate('/signin')
@@ -71,7 +70,7 @@ function Navbar() {
           </div>
 
           <div className="flex items-center space-x-4">
-            {user ? (
+            {profile ? (
               <div className="flex items-center space-x-4">
                 <Link
                   to="/profile"
