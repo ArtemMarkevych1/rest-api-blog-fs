@@ -1,13 +1,20 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { format, parseISO } from 'date-fns'
 import PostCard from '../components/PostCard'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { fetchUserProfile } from '../store/actions/userActions'
+import DeleteConfirmModal from '../components/DeleteConfirmModal'
+import EditPostModal from '../components/EditPostModal'
+import { deletePost } from '../store/actions/postActions'
 
 function UserProfile() {
   const dispatch = useDispatch()
   const { profile, loading } = useSelector(state => state.user)
   const { posts, createdAt, profilePicture, username, email, role } = profile || {}
+
+  const [post, setPost] = useState(null)
+  const [deleteModal, setDeleteModal] = useState(false)
+  const [editModal, setEditModal] = useState(false)
 
   const formatDate = (dateString) => {
     try {
@@ -19,14 +26,29 @@ function UserProfile() {
     }
   }
 
-  const handleEditPost = (post) => {
-    // Handle edit post
-    console.log('Edit post:', post)
+  const handleDeleteClick = (post) => {
+    setPost(post)
+    setDeleteModal(true)
   }
 
-  const handleDeletePost = (post) => {
-    // Handle delete post
-    console.log('Delete post:', post)
+  const handleDeleteCancel = () => {
+    setDeleteModal(false)
+  }
+
+  const handleDeleteConfirm = (post) => {
+    if (post) {
+      dispatch(deletePost(post._id))
+      setDeleteModal(false)
+    }
+  }
+
+  const handleEditClick = (post) => {
+    setPost(post)
+    setEditModal(true)
+  }
+
+  const handleEditCancel = () => {
+    setEditModal(false)
   }
 
   useEffect(() => {
@@ -54,6 +76,20 @@ function UserProfile() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
+      <DeleteConfirmModal
+        isOpen={deleteModal}
+        onClose={handleDeleteCancel}
+        onConfirm={() => handleDeleteConfirm(post)}
+        title={"Are you sure you want to delete this post?"}
+        refreshProfile={() => dispatch(fetchUserProfile())}
+      />
+
+      <EditPostModal
+        isOpen={editModal}
+        onClose={handleEditCancel}
+        post={post}
+        refreshProfile={() => dispatch(fetchUserProfile())}
+      />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           {/* Profile Header */}
@@ -139,11 +175,11 @@ function UserProfile() {
           {posts?.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {posts.map(post => (
-                <PostCard 
-                  key={post._id} 
+                <PostCard
+                  key={post._id}
                   post={post}
-                  onEdit={handleEditPost}
-                  onDelete={handleDeletePost}
+                  onEdit={() => handleEditClick(post)}
+                  onDelete={() => handleDeleteClick(post)}
                 />
               ))}
             </div>

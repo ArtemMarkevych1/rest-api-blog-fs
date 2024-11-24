@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 
-function DeleteConfirmModal({ isOpen, onClose, onConfirm, title }) {
+function DeleteConfirmModal({ isOpen, onClose, onConfirm, title, refreshProfile }) {
 
   if (!isOpen) return null
 
@@ -34,7 +34,10 @@ function DeleteConfirmModal({ isOpen, onClose, onConfirm, title }) {
             </button>
             <button
               type="button"
-              onClick={onConfirm}
+              onClick={() => {
+                onConfirm()
+                refreshProfile()
+              }}
               className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
             >
               Delete
@@ -53,4 +56,5 @@ DeleteConfirmModal.propTypes = {
   onClose: PropTypes.func.isRequired,
   onConfirm: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
+  refreshProfile: PropTypes.func
 }

@@ -4,7 +4,7 @@ import { updatePost } from '../store/actions/postActions'
 import { Categories } from '../constants/categories'
 import PropTypes from 'prop-types'
 
-function EditPostModal({ isOpen, onClose, post }) {
+function EditPostModal({ isOpen, onClose, post, refreshProfile }) {
   const dispatch = useDispatch()
   const { loading } = useSelector(state => state.posts)
   const [formData, setFormData] = useState({
@@ -41,7 +41,9 @@ function EditPostModal({ isOpen, onClose, post }) {
       id: post._id,
       data: formData
     }))
+
     onClose()
+    refreshProfile()
   }
 
   if (!isOpen) return null
@@ -174,4 +176,5 @@ EditPostModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   post: PropTypes.object,
+  refreshProfile: PropTypes.func
 } 
