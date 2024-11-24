@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { fetchUserProfile } from '../store/actions/userActions'
 import DeleteConfirmModal from '../components/DeleteConfirmModal'
 import EditPostModal from '../components/EditPostModal'
+import EditProfileModal from '../components/EditProfileModal'
 import { deletePost } from '../store/actions/postActions'
 
 function UserProfile() {
@@ -15,6 +16,7 @@ function UserProfile() {
   const [post, setPost] = useState(null)
   const [deleteModal, setDeleteModal] = useState(false)
   const [editModal, setEditModal] = useState(false)
+  const [editProfileModal, setEditProfileModal] = useState(false)
 
   const formatDate = (dateString) => {
     try {
@@ -42,13 +44,21 @@ function UserProfile() {
     }
   }
 
-  const handleEditClick = (post) => {
+  const handleEditPostClick = (post) => {
     setPost(post)
     setEditModal(true)
   }
 
-  const handleEditCancel = () => {
+  const handleEditPostCancel = () => {
     setEditModal(false)
+  }
+
+  const handleEditProfileClick = () => {
+    setEditProfileModal(true)
+  }
+
+  const handleEditProfileCancel = () => {
+    setEditProfileModal(false)
   }
 
   useEffect(() => {
@@ -86,9 +96,15 @@ function UserProfile() {
 
       <EditPostModal
         isOpen={editModal}
-        onClose={handleEditCancel}
+        onClose={handleEditPostCancel}
         post={post}
         refreshProfile={() => dispatch(fetchUserProfile())}
+      />
+      <EditProfileModal
+        isOpen={editProfileModal}
+        onClose={handleEditProfileCancel}
+        refreshProfile={() => dispatch(fetchUserProfile())}
+        profile={profile}
       />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
@@ -127,7 +143,7 @@ function UserProfile() {
                 <h1 className="text-2xl font-bold text-gray-900">{username}</h1>
                 <p className="text-gray-500">{email}</p>
               </div>
-              <button className="px-4 py-2 text-sm font-medium text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-50 transition-colors duration-300">
+              <button className="px-4 py-2 text-sm font-medium text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-50 transition-colors duration-300" onClick={handleEditProfileClick}>
                 Edit Profile
               </button>
             </div>
@@ -178,7 +194,7 @@ function UserProfile() {
                 <PostCard
                   key={post._id}
                   post={post}
-                  onEdit={() => handleEditClick(post)}
+                  onEdit={() => handleEditPostClick(post)}
                   onDelete={() => handleDeleteClick(post)}
                 />
               ))}

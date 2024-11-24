@@ -31,16 +31,6 @@ axiosInstance.interceptors.request.use((config) => {
 })
 
 class AuthService {
-  async getCurrentUser() {
-    const response = await axiosInstance.get('/auth/current-user', {
-      headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0'
-      }
-    })
-    return response.data
-  }
 
   async signIn(credentials) {
     const response = await axiosInstance.post('/auth/signin', credentials)
@@ -102,16 +92,25 @@ class PostService {
 }
 
 class UserService {
-  async getUserProfile() {
-    return await axiosInstance.get('/users/profile')
+
+  async getCurrentUser() {
+    const response = await axiosInstance.get('/user/current-user', {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    })
+    return response.data
   }
 
   async getUserPosts(userId) {
     return await axiosInstance.get(`/users/${userId}/posts`)
   }
 
-  async updateUserProfile(userData) {
-    return await axiosInstance.put('/users/profile', userData)
+  async updateUser(userData) {
+    const response = await axiosInstance.put('/user/update-user/', userData);
+    return response.data;
   }
 }
 

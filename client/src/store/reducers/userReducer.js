@@ -22,6 +22,19 @@ const userSlice = createSlice({
     fetchUserProfileFailure: (state, action) => {
       state.loading = false
       state.error = action.payload
+    },
+    updateUserRequest: (state) => {
+      state.loading = true
+      state.error = null
+    },
+    updateUserSuccess: (state, action) => {
+      state.loading = false
+      state.profile = action.payload
+      state.error = null
+    },
+    updateUserFailure: (state, action) => {
+      state.loading = false
+      state.error = action.payload
     }
   }
 })
@@ -29,7 +42,10 @@ const userSlice = createSlice({
 export const {
   fetchUserProfileRequest,
   fetchUserProfileSuccess,
-  fetchUserProfileFailure
+  fetchUserProfileFailure,
+  updateUserRequest,
+  updateUserSuccess,
+  updateUserFailure
 } = userSlice.actions
 
 export default userSlice.reducer 
