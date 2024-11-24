@@ -1,10 +1,13 @@
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { format, parseISO } from 'date-fns'
 import PostCard from '../components/PostCard'
+import { useEffect } from 'react'
+import { fetchUserProfile } from '../store/actions/userActions'
 
 function UserProfile() {
+  const dispatch = useDispatch()
   const { user } = useSelector(state => state.auth)
-  const { posts } = user.data
+  const { posts, createdAt, profilePicture, username, email, role } = user?.data || {}
 
   const formatDate = (dateString) => {
     try {
@@ -26,6 +29,10 @@ function UserProfile() {
     console.log('Delete post:', post)
   }
 
+  useEffect(() => {
+    dispatch(fetchUserProfile())
+  }, [dispatch])
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -39,7 +46,6 @@ function UserProfile() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
-      {/* <pre>{JSON.stringify(user, null, 2)}</pre> */}
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           {/* Profile Header */}
@@ -47,10 +53,10 @@ function UserProfile() {
             {/* Profile Picture */}
             <div className="absolute -bottom-12 left-8">
               <div className="relative">
-                {user.profilePicture ? (
+                {profilePicture ? (
                   <img
-                    src={user.profilePicture}
-                    alt={user.username}
+                    src={profilePicture}
+                    alt={username}
                     className="w-24 h-24 rounded-full border-4 border-white object-cover"
                   />
                 ) : (
@@ -74,8 +80,8 @@ function UserProfile() {
           <div className="px-8 pt-16 pb-8">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">{user.username}</h1>
-                <p className="text-gray-500">{user.email}</p>
+                <h1 className="text-2xl font-bold text-gray-900">{username}</h1>
+                <p className="text-gray-500">{email}</p>
               </div>
               <button className="px-4 py-2 text-sm font-medium text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-50 transition-colors duration-300">
                 Edit Profile
@@ -85,7 +91,7 @@ function UserProfile() {
             {/* User Stats */}
             <div className="grid grid-cols-3 gap-6 mb-8">
               <div className="bg-gray-50 rounded-lg p-4 text-center">
-                <p className="text-2xl font-semibold text-gray-900">0</p>
+                <p className="text-2xl font-semibold text-gray-900">{posts?.length}</p>
                 <p className="text-sm text-gray-500">Posts</p>
               </div>
               <div className="bg-gray-50 rounded-lg p-4 text-center">
@@ -104,9 +110,9 @@ function UserProfile() {
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
-                <span>Joined {formatDate(user.createdAt)}</span>
+                <span>Joined {formatDate(createdAt)}</span>
               </div>
-              {user.role === 1 && (
+              {role === 1 && (
                 <div className="flex items-center text-gray-600">
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
@@ -124,11 +130,7 @@ function UserProfile() {
 
           {posts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-
-              
-
-
-              {user.data.posts.map(post => (
+              {posts.map(post => (
                 <PostCard 
                   key={post._id} 
                   post={post}
