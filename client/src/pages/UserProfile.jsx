@@ -6,8 +6,8 @@ import { fetchUserProfile } from '../store/actions/userActions'
 
 function UserProfile() {
   const dispatch = useDispatch()
-  const { user } = useSelector(state => state.auth)
-  const { posts, createdAt, profilePicture, username, email, role } = user?.data || {}
+  const { profile, loading } = useSelector(state => state.user)
+  const { posts, createdAt, profilePicture, username, email, role } = profile || {}
 
   const formatDate = (dateString) => {
     try {
@@ -33,7 +33,15 @@ function UserProfile() {
     dispatch(fetchUserProfile())
   }, [dispatch])
 
-  if (!user) {
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
+      </div>
+    )
+  }
+
+  if (!profile) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="bg-red-50 p-6 rounded-lg shadow-sm">
@@ -128,7 +136,7 @@ function UserProfile() {
         <div className="mt-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">My Posts</h2>
 
-          {posts.length > 0 ? (
+          {posts?.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
               {posts.map(post => (
                 <PostCard 

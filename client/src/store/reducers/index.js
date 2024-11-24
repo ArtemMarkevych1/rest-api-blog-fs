@@ -1,12 +1,12 @@
 import { combineReducers } from '@reduxjs/toolkit'
 import authReducer from './authReducer'
 import postReducer from './postReducer'
-// import uiReducer from './uiReducer'
+import userReducer from './userReducer'
 
 const rootReducer = combineReducers({
   auth: authReducer,
   posts: postReducer,
-//   ui: uiReducer
+  user: userReducer,
 })
 
 export default rootReducer 
