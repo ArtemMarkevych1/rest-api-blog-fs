@@ -47,15 +47,25 @@ class AuthService {
 }
 
 class PostService {
-  async getPosts() {
-    const response = await axiosInstance.get('/post', {
-      headers: {
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache',
-        'Expires': '0'
-      }
-    })
-    return response
+
+  async getPosts(queryParams = {}) {
+    try {
+      // Convert queryParams to URLSearchParams
+      const params = new URLSearchParams()
+      
+      // Add all query parameters
+      Object.entries(queryParams).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          params.append(key, value)
+        }
+      })
+
+      const response = await axiosInstance.get(`/post?${params.toString()}`)
+      return response
+    } catch (error) {
+      console.error('Error fetching posts:', error)
+      throw error
+    }
   }
 
   async getPost(postId) {
@@ -72,14 +82,6 @@ class PostService {
 
   async deletePost(postId) {
     return await axiosInstance.delete(`/post/${postId}`)
-  }
-
-  async getPostsByCategory(category) {
-    if (!isValidCategory(category)) {
-      throw new Error('Invalid category')
-    }
-    const response = await axiosInstance.get(`/posts/category/${Categories[category]}`)
-    return response.data
   }
 
   async updatePost(postId, postData) {

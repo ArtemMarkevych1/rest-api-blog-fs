@@ -23,8 +23,8 @@ export const POST_ACTIONS = {
   FETCH_USER_POSTS_FAILURE: 'posts/fetchUserPostsFailure'
 }
 
-export const fetchPosts = () => {
-  return fetchPostsRequest()
+export const fetchPosts = (queryParams = {}) => {
+  return fetchPostsRequest(queryParams)
 }
 
 export const createPost = (postData) => {

@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { signOut } from '../store/reducers/authReducer'
+import { fetchPosts } from '../store/actions/postActions'
 
 const CATEGORIES = [
   { id: 'technology', label: 'Technology' },
@@ -29,7 +30,7 @@ function Navbar() {
   }
 
   const handleCategorySelect = (categoryId) => {
-    navigate(`/category/${categoryId}`)
+    dispatch(fetchPosts({ category: categoryId }))
   }
 
   return (
