@@ -24,7 +24,7 @@ function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { profile } = useSelector(state => state.user)
+  const { profile, loading } = useSelector(state => state.user)
   const { user } = useSelector(state => state.auth)
   const currentCategory = searchParams.get('category')
 
@@ -133,7 +133,12 @@ function Navbar() {
           </div>
 
           <div className="flex items-center space-x-4">
-            {user && profile ? (
+            {loading ? (
+              // Loading skeleton
+              <div className="flex items-center space-x-4">
+                <div className="h-8 w-32 bg-gray-200 animate-pulse rounded"></div>
+              </div>
+            ) : user && profile ? (
               <div className="flex items-center space-x-4">
                 <Link
                   to="/profile"
