@@ -25,14 +25,18 @@ function Navbar() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { profile } = useSelector(state => state.user)
+  const { user } = useSelector(state => state.auth)
   const currentCategory = searchParams.get('category')
 
   useEffect(() => {
-    dispatch(fetchUserProfile())
-  }, [dispatch])
+    if (user) {
+      dispatch(fetchUserProfile())
+    }
+  }, [dispatch, user])
 
   const handleSignOut = () => {
     dispatch(signOut())
+    dispatch({ type: 'user/clearProfile' })
     navigate('/signin')
   }
 
@@ -129,7 +133,7 @@ function Navbar() {
           </div>
 
           <div className="flex items-center space-x-4">
-            {profile ? (
+            {user && profile ? (
               <div className="flex items-center space-x-4">
                 <Link
                   to="/profile"
