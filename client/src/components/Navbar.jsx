@@ -24,6 +24,7 @@ function Navbar() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { profile } = useSelector(state => state.user)
+  const currentCategory = searchParams.get('category')
 
   const { username } = profile || {}
   const handleSignOut = () => {
@@ -32,19 +33,26 @@ function Navbar() {
   }
 
   const handleCategorySelect = (categoryId) => {
-    // Update URL with selected category, page, and size
     setSearchParams({ 
       category: categoryId, 
       page: '1',
       size: '10'
     })
     
-    // Update Redux state
     dispatch(setCurrentCategory(categoryId))
-    
-    // Fetch posts with new category
     dispatch(fetchPostsRequest({ 
       category: categoryId,
+      page: 1,
+      size: 10
+    }))
+  }
+
+  const handleResetFilters = () => {
+    setSearchParams({})
+    
+    dispatch(setCurrentCategory(null))
+    
+    dispatch(fetchPostsRequest({ 
       page: 1,
       size: 10
     }))
@@ -88,7 +96,11 @@ function Navbar() {
                     <button
                       key={category.id}
                       onClick={() => handleCategorySelect(category.id)}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className={`block w-full text-left px-4 py-2 text-sm ${
+                        currentCategory === category.id 
+                          ? 'bg-indigo-50 text-indigo-700' 
+                          : 'text-gray-700 hover:bg-gray-100'
+                      }`}
                       role="menuitem"
                     >
                       {category.label}
@@ -97,6 +109,19 @@ function Navbar() {
                 </div>
               </div>
             </div>
+
+            {/* Reset Filters Button - Only show when category is selected */}
+            {currentCategory && (
+              <button
+                onClick={handleResetFilters}
+                className="ml-4 inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Reset Filters
+              </button>
+            )}
           </div>
 
           <div className="flex items-center space-x-4">
