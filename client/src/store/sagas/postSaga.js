@@ -1,11 +1,7 @@
-import { takeLatest, put, call } from 'redux-saga/effects'
+import { takeLatest, put, call, select } from 'redux-saga/effects'
 import { POST_ACTIONS } from '../actions/postActions'
 import { postService } from '../../services/api'
 import {
-  fetchPostsSuccess,
-  fetchPostsFailure,
-  createPostSuccess,
-  createPostFailure,
   updatePostSuccess,
   updatePostFailure,
   deletePostSuccess,
@@ -15,14 +11,19 @@ import {
   fetchPostsRequest
 } from '../reducers/postReducer'
 
+// Selector to get current URL params from state
+const getCurrentUrlParams = () => {
+  const searchParams = new URLSearchParams(window.location.search)
+  return {
+    category: searchParams.get('category'),
+    page: parseInt(searchParams.get('page')) || 1,
+    size: parseInt(searchParams.get('size')) || 10
+  }
+}
+
 function* fetchPostsSaga(action) {
   try {
-    const { category, page, size } = action.payload || {}
-    const response = yield call(postService.getPosts, {
-      category,
-      page,
-      size
-    })
+    const response = yield call(postService.getPosts, action.payload)
     yield put({
       type: POST_ACTIONS.FETCH_POSTS_SUCCESS,
       payload: response
@@ -35,13 +36,26 @@ function* fetchPostsSaga(action) {
   }
 }
 
-function* createPost(action) {
-    try {
-        const response = yield call(postService.createPost, action.payload)
-        yield put(createPostSuccess(response.data))
-    } catch (error) {
-        yield put(createPostFailure(error.message))
-    }
+function* createPostSaga(action) {
+  try {
+    const response = yield call(postService.createPost, action.payload)
+    yield put({
+      type: POST_ACTIONS.CREATE_POST_SUCCESS,
+      payload: response
+    })
+    
+    // After successful post creation, fetch posts with current URL params
+    const currentParams = yield select(getCurrentUrlParams)
+    yield put({
+      type: POST_ACTIONS.FETCH_POSTS_REQUEST,
+      payload: currentParams
+    })
+  } catch (error) {
+    yield put({
+      type: POST_ACTIONS.CREATE_POST_FAILURE,
+      payload: error.message
+    })
+  }
 }
 
 function* updatePost(action) {
@@ -75,7 +89,7 @@ function* fetchUserPosts(action) {
 
 export function* watchPosts() {
     yield takeLatest(POST_ACTIONS.FETCH_POSTS_REQUEST, fetchPostsSaga)
-    yield takeLatest(POST_ACTIONS.CREATE_POST_REQUEST, createPost)
+    yield takeLatest(POST_ACTIONS.CREATE_POST_REQUEST, createPostSaga)
     yield takeLatest(POST_ACTIONS.UPDATE_POST_REQUEST, updatePost)
     yield takeLatest(POST_ACTIONS.DELETE_POST_REQUEST, deletePost)
     yield takeLatest(POST_ACTIONS.FETCH_USER_POSTS_REQUEST, fetchUserPosts)
