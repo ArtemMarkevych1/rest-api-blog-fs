@@ -2,6 +2,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { signOut } from '../store/reducers/authReducer'
 import { setCurrentCategory, fetchPostsRequest } from '../store/reducers/postReducer'
+import { fetchUserProfile } from '../store/actions/userActions'
 import { useEffect } from 'react'
 
 const CATEGORIES = [
@@ -26,7 +27,10 @@ function Navbar() {
   const { profile } = useSelector(state => state.user)
   const currentCategory = searchParams.get('category')
 
-  const { username } = profile || {}
+  useEffect(() => {
+    dispatch(fetchUserProfile())
+  }, [dispatch])
+
   const handleSignOut = () => {
     dispatch(signOut())
     navigate('/signin')
@@ -134,7 +138,7 @@ function Navbar() {
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
-                  {username}
+                  {profile.username}
                 </Link>
                 <button
                   onClick={handleSignOut}
