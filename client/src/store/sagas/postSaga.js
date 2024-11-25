@@ -16,16 +16,24 @@ import {
 } from '../reducers/postReducer'
 
 function* fetchPostsSaga(action) {
-    try {
-      const response = yield call(postService.getPosts, action.payload); // Pass query params
-      yield put(fetchPostsSuccess({
-        posts: response.posts,
-        pagination: response.pagination
-      }))
-    } catch (error) {
-      yield put(fetchPostsFailure(error.message));
-    }
+  try {
+    const { category, page, size } = action.payload || {}
+    const response = yield call(postService.getPosts, {
+      category,
+      page,
+      size
+    })
+    yield put({
+      type: POST_ACTIONS.FETCH_POSTS_SUCCESS,
+      payload: response
+    })
+  } catch (error) {
+    yield put({
+      type: POST_ACTIONS.FETCH_POSTS_FAILURE,
+      payload: error.message
+    })
   }
+}
 
 function* createPost(action) {
     try {

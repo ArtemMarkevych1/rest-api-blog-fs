@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useSearchParams } from 'react-router-dom'
 import { fetchPosts, deletePost } from '../store/actions/postActions'
 import CreatePost from '../components/CreatePost'
 import DeleteConfirmModal from '../components/DeleteConfirmModal'
@@ -10,14 +11,25 @@ function Home() {
   const dispatch = useDispatch()
   const { items: posts, loading, error } = useSelector(state => state.posts)
   const { user } = useSelector(state => state.auth)
+  const [searchParams] = useSearchParams()
 
   const [post, setPost] = useState(null)
   const [deleteModal, setDeleteModal] = useState(false)
   const [editModal, setEditModal] = useState(false)
 
   useEffect(() => {
-    dispatch(fetchPosts())
-  }, [dispatch])
+    // Get URL parameters
+    const category = searchParams.get('category')
+    const page = parseInt(searchParams.get('page')) || 1
+    const size = parseInt(searchParams.get('size')) || 10
+
+    // Fetch posts with URL parameters
+    dispatch(fetchPosts({
+      category,
+      page,
+      size
+    }))
+  }, [dispatch, searchParams])
 
   const handleDeleteClick = (post) => {
     setPost(post)
