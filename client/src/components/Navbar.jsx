@@ -5,18 +5,18 @@ import { setCurrentCategory, fetchPostsRequest } from '../store/reducers/postRed
 import { useEffect } from 'react'
 
 const CATEGORIES = [
-  { id: 'technology', label: 'Technology' },
-  { id: 'lifestyle', label: 'Lifestyle' },
-  { id: 'travel', label: 'Travel' },
-  { id: 'food', label: 'Food' },
-  { id: 'health', label: 'Health' },
-  { id: 'fitness', label: 'Fitness' },
-  { id: 'business', label: 'Business' },
-  { id: 'finance', label: 'Finance' },
-  { id: 'education', label: 'Education' },
-  { id: 'entertainment', label: 'Entertainment' },
-  { id: 'gaming', label: 'Gaming' },
-  { id: 'science', label: 'Science' }
+  { id: 'Technology', label: 'Technology' },
+  { id: 'Lifestyle', label: 'Lifestyle' },
+  { id: 'Travel', label: 'Travel' },
+  { id: 'Food', label: 'Food' },
+  { id: 'Health', label: 'Health' },
+  { id: 'Fitness', label: 'Fitness' },
+  { id: 'Business', label: 'Business' },
+  { id: 'Finance', label: 'Finance' },
+  { id: 'Education', label: 'Education' },
+  { id: 'Entertainment', label: 'Entertainment' },
+  { id: 'Gaming', label: 'Gaming' },
+  { id: 'Science', label: 'Science' }
 ]
 
 function Navbar() {
@@ -32,29 +32,35 @@ function Navbar() {
   }
 
   const handleCategorySelect = (categoryId) => {
-    // Update URL with selected category
-    setSearchParams({ category: categoryId, page: '1' });
+    // Update URL with selected category, page, and size
+    setSearchParams({ 
+      category: categoryId, 
+      page: '1',
+      size: '10'
+    })
     
     // Update Redux state
-    dispatch(setCurrentCategory(categoryId));
+    dispatch(setCurrentCategory(categoryId))
     
     // Fetch posts with new category
     dispatch(fetchPostsRequest({ 
       category: categoryId,
-      page: 1 // Reset to first page when changing category
-    }));
+      page: 1,
+      size: 10
+    }))
   }
 
   useEffect(() => {
-    const categoryFromUrl = searchParams.get('category');
+    const categoryFromUrl = searchParams.get('category')
     if (categoryFromUrl) {
-      dispatch(setCurrentCategory(categoryFromUrl));
+      dispatch(setCurrentCategory(categoryFromUrl))
       dispatch(fetchPostsRequest({ 
         category: categoryFromUrl,
-        page: parseInt(searchParams.get('page')) || 1
-      }));
+        page: parseInt(searchParams.get('page')) || 1,
+        size: parseInt(searchParams.get('size')) || 10
+      }))
     }
-  }, [dispatch, searchParams]);
+  }, [dispatch, searchParams])
 
   return (
     <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200">
