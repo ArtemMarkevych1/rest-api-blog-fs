@@ -170,23 +170,41 @@ const deletePost = async (req, res, next) => {
     }
 };
 
-const toggleLike = async (req, res, next) => {
+const toggleLike = async (req, res) => {
     try {
-        const { postId } = req.params;
-        const post = await Post.findById(postId);
+        const postId = req.params.postId
+        const userId = req.user._id // Get user ID from auth middleware
 
+        // Find the post
+        const post = await Post.findById(postId)
         if (!post) {
             return res.status(404).json({
                 success: false,
-                message: "Post not found"
-            });
+                message: 'Post not found'
+            })
         }
 
-        await post.toggleLike(req.user._id);
+        // Toggle like using the model method
+        await post.toggleLike(userId)
+
+        // Return updated post with populated fields
+        const updatedPost = await Post.findById(postId)
+            .populate('createdBy', 'username profilePicture')
+
+        res.json({
+            success: true,
+            message: post.likes.includes(userId) ? 'Post liked' : 'Post unliked',
+            data: updatedPost
+        })
+
     } catch (error) {
-        next(error);
+        console.error('Toggle like error:', error)
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Error toggling like'
+        })
     }
-};
+}
 
 module.exports = {
     createPost,
