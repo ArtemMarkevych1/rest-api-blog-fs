@@ -2,7 +2,9 @@ import {
   fetchPostsRequest,
   createPostRequest,
   deletePostRequest,
-  fetchUserPostsRequest} from '../reducers/postReducer'
+  fetchUserPostsRequest,
+  toggleLikeRequest
+} from '../reducers/postReducer'
 
 // Define action types that match the slice action types
 export const POST_ACTIONS = {
@@ -47,10 +49,11 @@ export const fetchUserPosts = (userId) => {
   return fetchUserPostsRequest(userId)
 } 
 
-export const toggleLikeRequest = (postId) => {
-  return toggleLikeRequest(postId)
-}
+// export const toggleLikeRequest = (postId) => {
+//   return toggleLikeRequest(postId)
+// }
 
-export const toggleLike = (postId) => {
-  return toggleLikeRequest(postId)
-}
+export const toggleLike = (postId) => ({
+  type: POST_ACTIONS.TOGGLE_LIKE_REQUEST,
+  payload: postId
+})

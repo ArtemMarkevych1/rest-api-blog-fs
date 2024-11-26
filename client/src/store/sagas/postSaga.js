@@ -91,10 +91,23 @@ function* fetchUserPosts(action) {
 
 function* toggleLikeSaga(action) {
   try {
-    yield call(postService.toggleLike, action.payload)
-    yield put(toggleLikeSuccess())
+    const response = yield call(postService.toggleLike, action.payload)
+    yield put({
+      type: POST_ACTIONS.TOGGLE_LIKE_SUCCESS,
+      payload: {
+        postId: action.payload,
+        updatedPost: response.data
+      }
+    })
+
+    yield put({
+      type: POST_ACTIONS.FETCH_POSTS_REQUEST,
+    })
   } catch (error) {
-    yield put(toggleLikeFailure(error.message))
+    yield put({
+      type: POST_ACTIONS.TOGGLE_LIKE_FAILURE,
+      payload: error.message
+    })
   }
 }
 

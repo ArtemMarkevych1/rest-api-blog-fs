@@ -10,11 +10,8 @@ const initialState = {
     hasNext: false,
     hasPrev: false
   },
-  currentCategory: null,
   loading: false,
-  error: null,
-  toggleLikeLoading: false,
-  toggleLikeError: null
+  error: null
 }
 
 const postSlice = createSlice({
@@ -92,14 +89,16 @@ const postSlice = createSlice({
       state.error = action.payload
     },
     toggleLikeRequest: (state) => {
-      state.loading = true
       state.error = null
     },
     toggleLikeSuccess: (state, action) => {
-      state.loading = false
+      const { postId, updatedPost } = action.payload
+      const postIndex = state.items.findIndex(post => post._id === postId)
+      if (postIndex !== -1) {
+        state.items[postIndex] = updatedPost
+      }
     },
     toggleLikeFailure: (state, action) => {
-      state.loading = false
       state.error = action.payload
     }
   }
