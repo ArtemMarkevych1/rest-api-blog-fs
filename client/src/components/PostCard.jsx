@@ -14,8 +14,8 @@ function PostCard({ post, onEdit, onDelete, onToggleLike }) {
     }
   }
 
-  // Check if current user has liked the post
-  const isLiked = post.likes?.includes(user?._id)
+  // Check if current user has liked this post
+  const hasUserLiked = user && post.likes?.includes(user.data._id)
 
   return (
     <article className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
@@ -56,28 +56,32 @@ function PostCard({ post, onEdit, onDelete, onToggleLike }) {
               {post.createdBy?.username || 'Unknown'}
             </div>
 
-            {/* Like Button */}
-            <button
-              onClick={() => onToggleLike(post._id)}
-              className={`flex items-center space-x-1 px-2 py-1 rounded-md transition-colors duration-200 ${
-                isLiked 
-                  ? 'text-red-600 bg-red-50 hover:bg-red-100' 
-                  : 'text-gray-500 hover:text-red-600 hover:bg-red-50'
-              }`}
-            >
-              <svg 
-                className={`w-5 h-5 ${isLiked ? 'fill-current' : 'stroke-current fill-none'}`} 
-                viewBox="0 0 24 24"
+            {/* Like Button with dynamic styling based on like state */}
+            {user && (
+              <button
+                onClick={() => onToggleLike(post._id)}
+                className={`flex items-center space-x-1 px-2 py-1 rounded-md transition-all duration-200 ${
+                  hasUserLiked 
+                    ? 'text-red-600 bg-red-50 hover:bg-red-100' 
+                    : 'text-gray-500 hover:text-red-600 hover:bg-red-50'
+                }`}
               >
-                <path 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round" 
-                  strokeWidth={2} 
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" 
-                />
-              </svg>
-              <span>{post.likesCount || 0}</span>
-            </button>
+                <svg 
+                  className={`w-5 h-5 transition-all duration-200 ${
+                    hasUserLiked ? 'fill-current' : 'stroke-current fill-none'
+                  }`} 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" 
+                  />
+                </svg>
+                <span className="font-medium">{post.likesCount || 0}</span>
+              </button>
+            )}
           </div>
 
           {user && user.data._id === post.createdBy?._id && (
@@ -117,9 +121,9 @@ PostCard.propTypes = {
     likes: PropTypes.arrayOf(PropTypes.string),
     likesCount: PropTypes.number
   }).isRequired,
-  onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
-  onToggleLike: PropTypes.func.isRequired
+  onEdit: PropTypes.func,
+  onDelete: PropTypes.func,
+  onToggleLike: PropTypes.func
 }
 
 export default PostCard 
