@@ -12,7 +12,9 @@ const initialState = {
   },
   currentCategory: null,
   loading: false,
-  error: null
+  error: null,
+  toggleLikeLoading: false,
+  toggleLikeError: null
 }
 
 const postSlice = createSlice({
@@ -86,6 +88,17 @@ const postSlice = createSlice({
       state.pagination = action.payload.pagination
     },
     fetchUserPostsFailure: (state, action) => {
+      state.loading = false
+      state.error = action.payload
+    },
+    toggleLikeRequest: (state) => {
+      state.loading = true
+      state.error = null
+    },
+    toggleLikeSuccess: (state, action) => {
+      state.loading = false
+    },
+    toggleLikeFailure: (state, action) => {
       state.loading = false
       state.error = action.payload
     }

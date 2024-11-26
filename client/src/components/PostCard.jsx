@@ -2,7 +2,7 @@ import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import { format, parseISO } from 'date-fns'
 
-function PostCard({ post, onEdit, onDelete }) {
+function PostCard({ post, onEdit, onDelete, onToggleLike }) {
   const { user } = useSelector(state => state.auth)
 
   const formatDate = (dateString) => {
@@ -13,6 +13,9 @@ function PostCard({ post, onEdit, onDelete }) {
       return error.message
     }
   }
+
+  // Check if current user has liked the post
+  const isLiked = post.likes?.includes(user?._id)
 
   return (
     <article className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
@@ -44,31 +47,56 @@ function PostCard({ post, onEdit, onDelete }) {
           {post.content}
         </p>
 
-        <div className="flex items-center justify-between text-sm text-gray-500">
-          <span className="flex items-center">
-            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
-            </svg>
-            {post.createdBy?.username || 'Unknown'}
-          </span>
-        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center text-gray-500">
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              {post.createdBy?.username || 'Unknown'}
+            </div>
 
-        {user && user.data._id === post.createdBy?._id && (
-          <div className="mt-4 flex space-x-3">
+            {/* Like Button */}
             <button
-              onClick={() => onDelete?.(post)}
-              className="flex-1 px-4 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors duration-300"
+              onClick={() => onToggleLike(post._id)}
+              className={`flex items-center space-x-1 px-2 py-1 rounded-md transition-colors duration-200 ${
+                isLiked 
+                  ? 'text-red-600 bg-red-50 hover:bg-red-100' 
+                  : 'text-gray-500 hover:text-red-600 hover:bg-red-50'
+              }`}
             >
-              Delete
-            </button>
-            <button
-              onClick={() => onEdit?.(post)}
-              className="flex-1 px-4 py-2 text-sm text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors duration-300"
-            >
-              Edit
+              <svg 
+                className={`w-5 h-5 ${isLiked ? 'fill-current' : 'stroke-current fill-none'}`} 
+                viewBox="0 0 24 24"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" 
+                />
+              </svg>
+              <span>{post.likesCount || 0}</span>
             </button>
           </div>
-        )}
+
+          {user && user.data._id === post.createdBy?._id && (
+            <div className="flex space-x-2">
+              <button
+                onClick={() => onDelete(post)}
+                className="px-3 py-1 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors duration-300"
+              >
+                Delete
+              </button>
+              <button
+                onClick={() => onEdit(post)}
+                className="px-3 py-1 text-sm text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors duration-300"
+              >
+                Edit
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </article>
   )
@@ -84,12 +112,14 @@ PostCard.propTypes = {
     createdAt: PropTypes.string.isRequired,
     createdBy: PropTypes.shape({
       _id: PropTypes.string.isRequired,
-      username: PropTypes.string.isRequired,
-      profilePicture: PropTypes.string
-    })
+      username: PropTypes.string.isRequired
+    }),
+    likes: PropTypes.arrayOf(PropTypes.string),
+    likesCount: PropTypes.number
   }).isRequired,
-  onEdit: PropTypes.func,
-  onDelete: PropTypes.func
+  onEdit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onToggleLike: PropTypes.func.isRequired
 }
 
 export default PostCard 

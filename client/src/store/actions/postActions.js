@@ -20,7 +20,10 @@ export const POST_ACTIONS = {
   DELETE_POST_FAILURE: 'posts/deletePostFailure',
   FETCH_USER_POSTS_REQUEST: 'posts/fetchUserPostsRequest',
   FETCH_USER_POSTS_SUCCESS: 'posts/fetchUserPostsSuccess',
-  FETCH_USER_POSTS_FAILURE: 'posts/fetchUserPostsFailure'
+  FETCH_USER_POSTS_FAILURE: 'posts/fetchUserPostsFailure',
+  TOGGLE_LIKE_REQUEST: 'posts/toggleLikeRequest',
+  TOGGLE_LIKE_SUCCESS: 'posts/toggleLikeSuccess',
+  TOGGLE_LIKE_FAILURE: 'posts/toggleLikeFailure'
 }
 
 export const fetchPosts = (queryParams = {}) => {
@@ -43,3 +46,11 @@ export const deletePost = (postId) => {
 export const fetchUserPosts = (userId) => {
   return fetchUserPostsRequest(userId)
 } 
+
+export const toggleLikeRequest = (postId) => {
+  return toggleLikeRequest(postId)
+}
+
+export const toggleLike = (postId) => {
+  return toggleLikeRequest(postId)
+}

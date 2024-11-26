@@ -87,6 +87,10 @@ class PostService {
     const response = await axiosInstance.put(`/post/${postId}`, postData)
     return response.data
   }
+
+  async toggleLike(postId) {
+    return await axiosInstance.post(`/post/${postId}/like`)
+  }
 }
 
 class UserService {

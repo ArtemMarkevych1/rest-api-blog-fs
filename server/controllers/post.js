@@ -170,10 +170,29 @@ const deletePost = async (req, res, next) => {
     }
 };
 
+const toggleLike = async (req, res, next) => {
+    try {
+        const { postId } = req.params;
+        const post = await Post.findById(postId);
+
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: "Post not found"
+            });
+        }
+
+        await post.toggleLike(req.user._id);
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     createPost,
     getAllPosts,
     getPostById,
     updatePost,
-    deletePost
+    deletePost,
+    toggleLike
 };

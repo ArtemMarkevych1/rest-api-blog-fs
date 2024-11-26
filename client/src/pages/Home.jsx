@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useSearchParams } from 'react-router-dom'
-import { fetchPosts, deletePost } from '../store/actions/postActions'
+import { fetchPosts, deletePost, toggleLike } from '../store/actions/postActions'
 import CreatePost from '../components/CreatePost'
 import DeleteConfirmModal from '../components/DeleteConfirmModal'
 import EditPostModal from '../components/EditPostModal'
 import PostCard from '../components/PostCard'
+
 
 function Home() {
   const dispatch = useDispatch()
@@ -54,6 +55,10 @@ function Home() {
 
   const handleEditCancel = () => {
     setEditModal(false)
+  }
+
+  const handleToggleLike = (postId) => {
+    dispatch(toggleLike(postId))
   }
 
   if (loading) {
@@ -109,6 +114,7 @@ function Home() {
               post={post}
               onEdit={() => handleEditClick(post)}
               onDelete={() => handleDeleteClick(post)}
+              onToggleLike={() => handleToggleLike(post._id)}
             />
           ))}
         </div>

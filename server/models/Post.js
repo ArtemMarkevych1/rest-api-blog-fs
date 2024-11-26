@@ -20,8 +20,15 @@ const postSchema = new mongoose.Schema({
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true,
-        index: true
+        required: true
+    },
+    likes: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    likesCount: {
+        type: Number,
+        default: 0
     },
     image: {
         type: String,
@@ -32,5 +39,24 @@ const postSchema = new mongoose.Schema({
 });
 
 postSchema.index({ createdBy: 1, createdAt: -1 });
+postSchema.index({ likes: 1 });
+
+postSchema.methods.toggleLike = function(userId) {
+    const userLikeIndex = this.likes.indexOf(userId);
+    
+    if (userLikeIndex === -1) {
+        this.likes.push(userId);
+        this.likesCount += 1;
+    } else {
+        this.likes.splice(userLikeIndex, 1);
+        this.likesCount -= 1;
+    }
+    
+    return this.save();
+}
+
+postSchema.virtual('isLiked').get(function() {
+    return this.likes.includes(this._id);
+});
 
 module.exports = mongoose.model('Post', postSchema);
