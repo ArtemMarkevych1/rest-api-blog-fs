@@ -121,7 +121,10 @@ export const {
   deletePostFailure,
   fetchUserPostsRequest,
   fetchUserPostsSuccess,
-  fetchUserPostsFailure
+  fetchUserPostsFailure,
+  toggleLikeRequest,
+  toggleLikeSuccess,
+  toggleLikeFailure
 } = postSlice.actions
 
 export default postSlice.reducer 
