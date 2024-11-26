@@ -49,11 +49,6 @@ export const fetchUserPosts = (userId) => {
   return fetchUserPostsRequest(userId)
 } 
 
-// export const toggleLikeRequest = (postId) => {
-//   return toggleLikeRequest(postId)
-// }
-
-export const toggleLike = (postId) => ({
-  type: POST_ACTIONS.TOGGLE_LIKE_REQUEST,
-  payload: postId
-})
+export const toggleLike = ({ postId }) => {
+  return toggleLikeRequest(postId)
+}

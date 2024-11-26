@@ -89,7 +89,7 @@ function* fetchUserPosts(action) {
     }
 }
 
-function* toggleLikeSaga(action) {
+function* toggleLike(action) {
   try {
     const response = yield call(postService.toggleLike, action.payload)
     yield put({
@@ -99,7 +99,6 @@ function* toggleLikeSaga(action) {
         updatedPost: response.data
       }
     })
-
     yield put({
       type: POST_ACTIONS.FETCH_POSTS_REQUEST,
     })
@@ -117,5 +116,5 @@ export function* watchPosts() {
     yield takeLatest(POST_ACTIONS.UPDATE_POST_REQUEST, updatePost)
     yield takeLatest(POST_ACTIONS.DELETE_POST_REQUEST, deletePost)
     yield takeLatest(POST_ACTIONS.FETCH_USER_POSTS_REQUEST, fetchUserPosts),
-    yield takeLatest(POST_ACTIONS.TOGGLE_LIKE_REQUEST, toggleLikeSaga)
+    yield takeLatest(POST_ACTIONS.TOGGLE_LIKE_REQUEST, toggleLike)
 } 

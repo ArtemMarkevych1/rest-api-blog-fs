@@ -7,7 +7,6 @@ import DeleteConfirmModal from '../components/DeleteConfirmModal'
 import EditPostModal from '../components/EditPostModal'
 import PostCard from '../components/PostCard'
 
-
 function Home() {
   const dispatch = useDispatch()
   const { items: posts, loading, error } = useSelector(state => state.posts)
@@ -57,8 +56,24 @@ function Home() {
     setEditModal(false)
   }
 
-  const handleToggleLike = (postId) => {
-    dispatch(toggleLike(postId))
+  const handleToggleLike = (post) => {
+    if (!user || !post) return // Don't allow liking if not logged in
+
+    // Optimistically update the UI
+    const isLiked = post.likes?.includes(user._id)
+    const updatedPost = {
+      ...post,
+      likes: isLiked
+        ? post.likes.filter(id => id !== user.data._id)
+        : [...(post.likes || []), user.data._id],
+      likesCount: isLiked ? (post.likesCount - 1) : (post.likesCount + 1)
+    }
+
+    // Dispatch the action with optimistic update
+    dispatch(toggleLike({
+      postId: post._id,
+      updatedPost
+    }))
   }
 
   if (loading) {
@@ -114,7 +129,7 @@ function Home() {
               post={post}
               onEdit={() => handleEditClick(post)}
               onDelete={() => handleDeleteClick(post)}
-              onToggleLike={() => handleToggleLike(post._id)}
+              onToggleLike={() => handleToggleLike(post)}
             />
           ))}
         </div>
