@@ -1,9 +1,11 @@
 import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import { format, parseISO } from 'date-fns'
+import { useState } from 'react'
 
 function PostCard({ post, onEdit, onDelete, onToggleLike, fullView }) {
   const { user } = useSelector(state => state.auth)
+  const [showTooltip, setShowTooltip] = useState(false)
 
   const formatDate = (dateString) => {
     try {
@@ -58,29 +60,47 @@ function PostCard({ post, onEdit, onDelete, onToggleLike, fullView }) {
 
             {/* Like Button with dynamic styling based on like state */}
             {fullView && user && (
-              <button
-                onClick={() => onToggleLike(post._id)}
-                className={`flex items-center space-x-1 px-2 py-1 rounded-md transition-all duration-200 ${
-                  hasUserLiked 
-                    ? 'text-red-600 bg-red-50 hover:bg-red-100' 
-                    : 'text-gray-500 hover:text-red-600 hover:bg-red-50'
-                }`}
-              >
-                <svg 
-                  className={`w-5 h-5 transition-all duration-200 ${
-                    hasUserLiked ? 'fill-current' : 'stroke-current fill-none'
-                  }`} 
-                  viewBox="0 0 24 24"
+              <div className="relative">
+                <button
+                  onClick={() => onToggleLike(post._id)}
+                  onMouseEnter={() => setShowTooltip(true)}
+                  onMouseLeave={() => setShowTooltip(false)}
+                  className={`flex items-center space-x-1 px-2 py-1 rounded-md transition-all duration-200 ${
+                    hasUserLiked 
+                      ? 'text-red-600 bg-red-50 hover:bg-red-100' 
+                      : 'text-gray-500 hover:text-red-600 hover:bg-red-50'
+                  }`}
                 >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" 
-                  />
-                </svg>
-                <span className="font-medium">{post.likesCount || 0}</span>
-              </button>
+                  <svg 
+                    className={`w-5 h-5 transition-all duration-200 ${
+                      hasUserLiked ? 'fill-current' : 'stroke-current fill-none'
+                    }`} 
+                    viewBox="0 0 24 24"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" 
+                    />
+                  </svg>
+                  <span className="font-medium">{post.likesCount || 0}</span>
+                </button>
+
+                {/* Tooltip */}
+                {showTooltip && (
+                  <div className="absolute left-0 mt-2 w-48 p-2 bg-white border border-gray-200 rounded-md shadow-lg">
+                    <h4 className="text-sm font-semibold text-gray-700">Liked by:</h4>
+                    <ul className="mt-1 text-sm text-gray-600">
+                      {post.likesDetails?.map(like => (
+                        <li key={like.userId}>
+                          {like.username} on {formatDate(like.date)}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
             )}
           </div>
 
@@ -119,7 +139,12 @@ PostCard.propTypes = {
       username: PropTypes.string.isRequired
     }),
     likes: PropTypes.arrayOf(PropTypes.string),
-    likesCount: PropTypes.number
+    likesCount: PropTypes.number,
+    likesDetails: PropTypes.arrayOf(PropTypes.shape({
+      userId: PropTypes.string.isRequired,
+      username: PropTypes.string.isRequired,
+      date: PropTypes.string.isRequired
+    }))
   }).isRequired,
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,
