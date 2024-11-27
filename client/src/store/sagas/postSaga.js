@@ -89,24 +89,18 @@ function* fetchUserPosts(action) {
     }
 }
 
-function* toggleLike(action) {
+function* toggleLikeSaga(action) {
   try {
-    const response = yield call(postService.toggleLike, action.payload)
-    yield put({
-      type: POST_ACTIONS.TOGGLE_LIKE_SUCCESS,
-      payload: {
-        postId: action.payload,
-        updatedPost: response.data
-      }
-    })
-    yield put({
-      type: POST_ACTIONS.FETCH_POSTS_REQUEST,
-    })
+    const { postId, optimisticUpdate } = action.payload
+    // Optimistically update the post
+    yield put(toggleLikeSuccess({ postId, updatedPost: optimisticUpdate }))
+
+    // Call the API to toggle like
+    const response = yield call(postService.toggleLike, postId)
+    // Update the post with the response from the server
+    yield put(toggleLikeSuccess({ postId, updatedPost: response.data }))
   } catch (error) {
-    yield put({
-      type: POST_ACTIONS.TOGGLE_LIKE_FAILURE,
-      payload: error.message
-    })
+    yield put(toggleLikeFailure(error.message))
   }
 }
 
@@ -116,5 +110,5 @@ export function* watchPosts() {
     yield takeLatest(POST_ACTIONS.UPDATE_POST_REQUEST, updatePost)
     yield takeLatest(POST_ACTIONS.DELETE_POST_REQUEST, deletePost)
     yield takeLatest(POST_ACTIONS.FETCH_USER_POSTS_REQUEST, fetchUserPosts),
-    yield takeLatest(POST_ACTIONS.TOGGLE_LIKE_REQUEST, toggleLike)
+    yield takeLatest(POST_ACTIONS.TOGGLE_LIKE_REQUEST, toggleLikeSaga)
 } 

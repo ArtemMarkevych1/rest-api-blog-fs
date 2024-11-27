@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useSearchParams } from 'react-router-dom'
-import { fetchPosts, deletePost, toggleLike } from '../store/actions/postActions'
+import { fetchPosts, toggleLike, deletePost } from '../store/actions/postActions'
 import CreatePost from '../components/CreatePost'
 import DeleteConfirmModal from '../components/DeleteConfirmModal'
 import EditPostModal from '../components/EditPostModal'
@@ -56,8 +56,12 @@ function Home() {
     setEditModal(false)
   }
 
-  const handleToggleLike = (post) => {
-    if (!user || !post) return // Don't allow liking if not logged in
+  const handleToggleLike = (postId) => {
+    if (!user || !postId) return // Don't allow liking if not logged in
+
+    // Find the post
+    const post = posts.find(p => p._id === postId)
+    if (!post) return
 
     // Optimistically update the UI
     const isLiked = post.likes?.includes(user._id)
@@ -70,10 +74,7 @@ function Home() {
     }
 
     // Dispatch the action with optimistic update
-    dispatch(toggleLike({
-      postId: post._id,
-      updatedPost
-    }))
+    dispatch(toggleLike(postId, updatedPost))
   }
 
   if (loading) {
@@ -109,7 +110,6 @@ function Home() {
         onClose={handleEditCancel}
         post={post}
       />
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-16">
           <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl md:text-6xl">
@@ -129,7 +129,7 @@ function Home() {
               post={post}
               onEdit={() => handleEditClick(post)}
               onDelete={() => handleDeleteClick(post)}
-              onToggleLike={() => handleToggleLike(post)}
+              onToggleLike={handleToggleLike}
             />
           ))}
         </div>
