@@ -1,12 +1,15 @@
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 import { format, parseISO } from 'date-fns'
-import { useState } from 'react'
+import { useState, useCallback, useEffect } from 'react'
+import { getUserById } from '../store/actions/userActions'
 
 function PostCard({ post, onEdit, onDelete, onToggleLike, fullView }) {
   const { user } = useSelector(state => state.auth)
+  const dispatch = useDispatch()
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
   const [showTooltip, setShowTooltip] = useState(false)
+  const [usernamesCache, setUsernamesCache] = useState({})
 
   const formatDate = (dateString) => {
     try {
@@ -16,6 +19,25 @@ function PostCard({ post, onEdit, onDelete, onToggleLike, fullView }) {
       return error.message
     }
   }
+
+  const getUserName = useCallback((userId) => {
+    if (usernamesCache[userId]) {
+      return usernamesCache[userId]
+    } else {
+      dispatch(getUserById(userId)).then((username) => {
+        setUsernamesCache(prevCache => ({
+          ...prevCache,
+          [userId]: username
+        }))
+      })
+    }
+  }, [dispatch, usernamesCache])
+
+  useEffect(() => {
+    if (post.createdBy?._id) {
+      getUserName(post.createdBy._id)
+    }
+  }, [post.createdBy, getUserName])
 
   // Check if current user has liked this post
   const hasUserLiked = user && post.likes?.includes(user.data._id)
@@ -60,7 +82,7 @@ function PostCard({ post, onEdit, onDelete, onToggleLike, fullView }) {
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
-              {post.createdBy?.username || 'Unknown'}
+              {usernamesCache[post.createdBy?._id] || 'Loading...'}
             </div>
 
             {/* Like Button with dynamic styling based on like state */}
@@ -92,8 +114,7 @@ function PostCard({ post, onEdit, onDelete, onToggleLike, fullView }) {
                   </svg>
                   <span className="font-medium">{post.likesCount || 0}</span>
                 </button>
-
-                {/* Tooltip */}
+              
                 {showTooltip && (
                   <div 
                     className="absolute p-2 bg-white border border-gray-200 rounded-md shadow-lg"
@@ -108,6 +129,7 @@ function PostCard({ post, onEdit, onDelete, onToggleLike, fullView }) {
                     </ul>
                   </div>
                 )}
+              
               </div>
             )}
           </div>
