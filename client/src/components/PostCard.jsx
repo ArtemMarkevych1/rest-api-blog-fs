@@ -5,6 +5,7 @@ import { useState } from 'react'
 
 function PostCard({ post, onEdit, onDelete, onToggleLike, fullView }) {
   const { user } = useSelector(state => state.auth)
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
   const [showTooltip, setShowTooltip] = useState(false)
 
   const formatDate = (dateString) => {
@@ -19,8 +20,12 @@ function PostCard({ post, onEdit, onDelete, onToggleLike, fullView }) {
   // Check if current user has liked this post
   const hasUserLiked = user && post.likes?.includes(user.data._id)
 
+  const handleMouseMove = (e) => {
+    setTooltipPosition({ x: e.clientX + 10, y: e.clientY })
+  }
+
   return (
-    <article className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
+    <article className="relative bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
       {post.image && (
         <div className="aspect-w-16 aspect-h-9">
           <img
@@ -65,6 +70,7 @@ function PostCard({ post, onEdit, onDelete, onToggleLike, fullView }) {
                   onClick={() => onToggleLike(post._id)}
                   onMouseEnter={() => setShowTooltip(true)}
                   onMouseLeave={() => setShowTooltip(false)}
+                  onMouseMove={handleMouseMove}
                   className={`flex items-center space-x-1 px-2 py-1 rounded-md transition-all duration-200 ${
                     hasUserLiked 
                       ? 'text-red-600 bg-red-50 hover:bg-red-100' 
@@ -89,12 +95,14 @@ function PostCard({ post, onEdit, onDelete, onToggleLike, fullView }) {
 
                 {/* Tooltip */}
                 {showTooltip && (
-                  <div className="absolute left-0 mt-2 w-48 p-2 bg-white border border-gray-200 rounded-md shadow-lg">
-                    <h4 className="text-sm font-semibold text-gray-700">Liked by:</h4>
+                  <div 
+                    className="absolute p-2 bg-white border border-gray-200 rounded-md shadow-lg"
+                    style={{ left: tooltipPosition.x, top: tooltipPosition.y }}
+                  >
                     <ul className="mt-1 text-sm text-gray-600">
-                      {post.likesDetails?.map(like => (
-                        <li key={like.userId}>
-                          {like.username} on {formatDate(like.date)}
+                      {post.likes?.map(like => (
+                        <li key={like}>
+                          {like}
                         </li>
                       ))}
                     </ul>

@@ -4,7 +4,10 @@ export const USER_ACTIONS = {
     FETCH_USER_PROFILE_FAILURE: 'user/fetchUserProfileFailure',
     UPDATE_USER_REQUEST: 'user/updateUserRequest',
     UPDATE_USER_SUCCESS: 'user/updateUserSuccess',
-    UPDATE_USER_FAILURE: 'user/updateUserFailure'
+    UPDATE_USER_FAILURE: 'user/updateUserFailure',
+    GET_USER_BY_ID_REQUEST: 'user/getUserByIdRequest',
+    GET_USER_BY_ID_SUCCESS: 'user/getUserByIdSuccess',
+    GET_USER_BY_ID_FAILURE: 'user/getUserByIdFailure'
 }
 
 export const fetchUserProfile = () => ({
@@ -34,4 +37,9 @@ export const updateUserSuccess = (data) => ({
 export const updateUserFailure = (error) => ({
     type: USER_ACTIONS.UPDATE_USER_FAILURE,
     payload: error
+})
+
+export const getUserById = (userId) => ({
+    type: USER_ACTIONS.GET_USER_BY_ID_REQUEST,  
+    payload: userId
 })

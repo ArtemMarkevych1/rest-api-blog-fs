@@ -40,10 +40,33 @@ const getCurrentUser = async (req, res) => {
     }
 }
 
+const getUserById = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.params.userId)
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'User name fetched successfully',
+            user: user || 'Unknown'
+        })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Error fetching user name'
+        })
+    }
+}
+
 const updateUser = async (req, res, next) => {
     try {
         const user = await User.findById(req.user._id)
-        .select('-password');
+            .select('-password');
 
         const { username, email, profilePicture } = req.body;
 
@@ -107,5 +130,6 @@ const updateUser = async (req, res, next) => {
 
 module.exports = {
     getCurrentUser,
-    updateUser
+    updateUser,
+    getUserById
 }

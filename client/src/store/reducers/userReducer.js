@@ -5,7 +5,8 @@ const userSlice = createSlice({
   initialState: {
     profile: null,
     loading: false,
-    error: null
+    error: null,
+    user: null
   },
   reducers: {
     fetchUserProfileRequest: (state) => {
@@ -38,6 +39,19 @@ const userSlice = createSlice({
       state.profile = null
       state.loading = false
       state.error = null
+    },
+    getUserByIdRequest: (state) => {
+      state.loading = true
+      state.error = null
+    },
+    getUserByIdSuccess: (state, action) => {
+      state.loading = false
+      state.user = action.payload
+      state.error = null
+      },
+    getUserByIdFailure: (state, action) => {
+      state.loading = false
+      state.error = action.payload
     }
   }
 })
@@ -49,7 +63,10 @@ export const {
   updateUserRequest,
   updateUserSuccess,
   updateUserFailure,
-  clearProfile
+  clearProfile,
+  getUserByIdRequest,
+  getUserByIdSuccess,
+  getUserByIdFailure
 } = userSlice.actions
 
 export default userSlice.reducer 

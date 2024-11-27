@@ -110,6 +110,10 @@ class UserService {
     return await axiosInstance.get(`/users/${userId}/posts`)
   }
 
+  async getUserById(userId) {
+    return await axiosInstance.get(`/user/get-user/${userId}`)
+  }
+
   async updateUser(userData) {
     const response = await axiosInstance.put('/user/update-user/', userData);
     return response.data;
