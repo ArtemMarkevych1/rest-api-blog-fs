@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { signOut } from '../store/reducers/authReducer'
 import { setCurrentCategory, fetchPostsRequest } from '../store/reducers/postReducer'
 import { fetchUserProfile } from '../store/actions/userActions'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import ConfirmationModal from './ConfirmationModal'
 
 const CATEGORIES = [
   { id: 'Technology', label: 'Technology' },
@@ -27,6 +28,7 @@ function Navbar() {
   const { profile, loading } = useSelector(state => state.user)
   const { user } = useSelector(state => state.auth)
   const currentCategory = searchParams.get('category')
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -77,6 +79,9 @@ function Navbar() {
       }))
     }
   }, [dispatch, searchParams])
+
+  const openModal = () => setIsModalOpen(true)
+  const closeModal = () => setIsModalOpen(false)
 
   return (
     <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200">
@@ -150,7 +155,7 @@ function Navbar() {
                   {profile.username}
                 </Link>
                 <button
-                  onClick={handleSignOut}
+                  onClick={openModal}
                   className="nav-link flex items-center"
                 >
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -178,6 +183,13 @@ function Navbar() {
           </div>
         </div>
       </div>
+
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onConfirm={handleSignOut}
+        message="Are you sure you want to sign out?"
+      />
     </nav>
   )
 }
