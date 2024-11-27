@@ -10,7 +10,7 @@ import PostCard from '../components/PostCard'
 function Home() {
   const dispatch = useDispatch()
   const { items: posts, loading, error } = useSelector(state => state.posts)
-  const { user } = useSelector(state => state.auth)
+  const { profile } = useSelector(state => state.user)
   const [searchParams] = useSearchParams()
 
   const [post, setPost] = useState(null)
@@ -56,25 +56,23 @@ function Home() {
     setEditModal(false)
   }
 
-  const handleToggleLike = (postId) => {
-    if (!user || !postId) return // Don't allow liking if not logged in
+  const handleToggleLike = (post) => {
+    if (!profile || !post) return // Don't allow liking if not logged in
 
-    // Find the post
-    const post = posts.find(p => p._id === postId)
     if (!post) return
 
     // Optimistically update the UI
-    const isLiked = post.likes?.includes(user._id)
+    const isLiked = post.likes?.includes(profile._id)
     const updatedPost = {
       ...post,
       likes: isLiked
-        ? post.likes.filter(id => id !== user.data._id)
-        : [...(post.likes || []), user.data._id],
+        ? post.likes.filter(id => id !== profile._id)
+        : [...(post.likes || []), profile._id],
       likesCount: isLiked ? (post.likesCount - 1) : (post.likesCount + 1)
     }
 
     // Dispatch the action with optimistic update
-    dispatch(toggleLike(postId, updatedPost))
+    dispatch(toggleLike(post._id, updatedPost))
   }
 
   if (loading) {
@@ -115,7 +113,7 @@ function Home() {
           <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl md:text-6xl">
             Latest Blog Posts
           </h1>
-          {user && (
+          {profile && (
             <div className="mt-8">
               <CreatePost />
             </div>
@@ -129,7 +127,7 @@ function Home() {
               post={post}
               onEdit={() => handleEditClick(post)}
               onDelete={() => handleDeleteClick(post)}
-              onToggleLike={handleToggleLike}
+              onToggleLike={() => handleToggleLike(post)}
             />
           ))}
         </div>

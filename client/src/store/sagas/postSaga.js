@@ -10,9 +10,9 @@ import {
   fetchUserPostsFailure,
   fetchPostsRequest,
   toggleLikeSuccess,
-  toggleLikeFailure
+  toggleLikeFailure,
 } from '../reducers/postReducer'
-
+import { fetchUserProfile } from '../actions/userActions'
 // Selector to get current URL params from state
 const getCurrentUrlParams = () => {
   const searchParams = new URLSearchParams(window.location.search)
@@ -30,6 +30,7 @@ function* fetchPostsSaga(action) {
       type: POST_ACTIONS.FETCH_POSTS_SUCCESS,
       payload: response
     })
+    yield put(fetchUserProfile())
   } catch (error) {
     yield put({
       type: POST_ACTIONS.FETCH_POSTS_FAILURE,
@@ -52,6 +53,8 @@ function* createPostSaga(action) {
       type: POST_ACTIONS.FETCH_POSTS_REQUEST,
       payload: currentParams
     })
+
+    yield put(fetchUserProfile())
   } catch (error) {
     yield put({
       type: POST_ACTIONS.CREATE_POST_FAILURE,
@@ -66,6 +69,7 @@ function* updatePost(action) {
         const response = yield call(postService.updatePost, id, data)
         yield put(updatePostSuccess(response.data))
         yield put(fetchPostsRequest())
+        yield put(fetchUserProfile())
     } catch (error) {
         yield put(updatePostFailure(error.message))
     }
@@ -75,6 +79,7 @@ function* deletePost(action) {
     try {
         yield call(postService.deletePost, action.payload)
         yield put(deletePostSuccess(action.payload))
+        yield put(fetchUserProfile())
     } catch (error) {
         yield put(deletePostFailure(error.message))
     }

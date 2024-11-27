@@ -10,7 +10,7 @@ import { deletePost } from '../store/actions/postActions'
 
 function UserProfile() {
   const dispatch = useDispatch()
-  const { profile, loading } = useSelector(state => state.user)
+  const { profile, loading, error } = useSelector(state => state.user)
   const { posts, createdAt, profilePicture, username, email, role } = profile || {}
 
   const [post, setPost] = useState(null)
@@ -65,10 +65,26 @@ function UserProfile() {
     dispatch(fetchUserProfile())
   }, [dispatch])
 
+  const handleDeletePost = (postId) => {
+    dispatch(deletePost(postId))
+    dispatch(fetchUserProfile())
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="bg-red-50 p-6 rounded-lg shadow-sm">
+          <h3 className="text-red-800 font-medium">Error</h3>
+          <p className="text-red-600 mt-2">{error}</p>
+        </div>
       </div>
     )
   }
