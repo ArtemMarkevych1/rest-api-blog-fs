@@ -128,6 +128,7 @@ function Home() {
               onEdit={() => handleEditClick(post)}
               onDelete={() => handleDeleteClick(post)}
               onToggleLike={() => handleToggleLike(post)}
+              fullView={true}
             />
           ))}
         </div>

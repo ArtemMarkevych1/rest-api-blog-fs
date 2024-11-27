@@ -212,6 +212,7 @@ function UserProfile() {
                   post={post}
                   onEdit={() => handleEditPostClick(post)}
                   onDelete={() => handleDeleteClick(post)}
+                  fullView={false}
                 />
               ))}
             </div>

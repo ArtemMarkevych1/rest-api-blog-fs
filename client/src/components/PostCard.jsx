@@ -2,7 +2,7 @@ import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import { format, parseISO } from 'date-fns'
 
-function PostCard({ post, onEdit, onDelete, onToggleLike }) {
+function PostCard({ post, onEdit, onDelete, onToggleLike, fullView }) {
   const { user } = useSelector(state => state.auth)
 
   const formatDate = (dateString) => {
@@ -57,7 +57,7 @@ function PostCard({ post, onEdit, onDelete, onToggleLike }) {
             </div>
 
             {/* Like Button with dynamic styling based on like state */}
-            {user && (
+            {fullView && user && (
               <button
                 onClick={() => onToggleLike(post._id)}
                 className={`flex items-center space-x-1 px-2 py-1 rounded-md transition-all duration-200 ${
@@ -84,7 +84,7 @@ function PostCard({ post, onEdit, onDelete, onToggleLike }) {
             )}
           </div>
 
-          {user && user.data._id === post.createdBy?._id && (
+          {fullView && user && user.data._id === post.createdBy?._id && (
             <div className="flex space-x-2">
               <button
                 onClick={() => onDelete(post)}
@@ -123,7 +123,8 @@ PostCard.propTypes = {
   }).isRequired,
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,
-  onToggleLike: PropTypes.func
+  onToggleLike: PropTypes.func,
+  fullView: PropTypes.bool
 }
 
 export default PostCard 
