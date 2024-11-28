@@ -130,9 +130,11 @@ const postSlice = createSlice({
       state.error = action.payload
     },
     updateCommentRequest: (state) => {
+      state.loading = true
       state.error = null
     },
     updateCommentSuccess: (state, action) => {
+      state.loading = false
       const { postId, commentId, updatedComment } = action.payload
       const postIndex = state.items.findIndex(post => post._id === postId)
       if (postIndex !== -1) {
@@ -143,6 +145,7 @@ const postSlice = createSlice({
       }
     },
     updateCommentFailure: (state, action) => {
+      state.loading = false
       state.error = action.payload
     },
     deleteCommentRequest: (state) => {

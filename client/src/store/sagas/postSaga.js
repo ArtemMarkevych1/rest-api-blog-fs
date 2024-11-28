@@ -132,9 +132,11 @@ function* toggleLikeSaga(action) {
 function* addCommentSaga(action) {
   try {
     const { postId, commentData } = action.payload
-    const response = yield call(postService.addComment, postId, commentData)
-    yield put(addCommentSuccess({ postId, comment: response.data }))
-    yield put(fetchPostsRequest())
+    yield call(postService.addComment, postId, commentData)
+    yield put(addCommentSuccess({ postId, commentData }))
+    
+    // Dispatch fetchPostById to refresh the post data
+    yield put(fetchPostById(postId))
   } catch (error) {
     yield put(addCommentFailure(error.message))
   }
@@ -143,9 +145,11 @@ function* addCommentSaga(action) {
 function* updateCommentSaga(action) {
   try {
     const { postId, commentId, commentData } = action.payload
-    const response = yield call(postService.updateComment, postId, commentId, commentData)
-    yield put(updateCommentSuccess({ postId, commentId, updatedComment: response.data }))
-    yield put(fetchPostsRequest())
+    yield call(postService.updateComment, postId, commentId, commentData)
+    yield put(updateCommentSuccess({ postId, commentId, commentData }))
+    
+    // Dispatch fetchPostById to refresh the post data
+    yield put(fetchPostById(postId))
   } catch (error) {
     yield put(updateCommentFailure(error.message))
   }
@@ -156,7 +160,9 @@ function* deleteCommentSaga(action) {
     const { postId, commentId } = action.payload
     yield call(postService.deleteComment, postId, commentId)
     yield put(deleteCommentSuccess({ postId, commentId }))
-    yield put(fetchPostsRequest())
+    
+    // Dispatch fetchPostById to refresh the post data
+    yield put(fetchPostById(postId))
   } catch (error) {
     yield put(deleteCommentFailure(error.message))
   }
