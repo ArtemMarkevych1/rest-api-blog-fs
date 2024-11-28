@@ -3,7 +3,6 @@ import {
   createPostRequest,
   deletePostRequest,
   fetchUserPostsRequest,
-  toggleLikeRequest
 } from '../reducers/postReducer'
 
 // Define action types that match the slice action types
@@ -25,7 +24,16 @@ export const POST_ACTIONS = {
   FETCH_USER_POSTS_FAILURE: 'posts/fetchUserPostsFailure',
   TOGGLE_LIKE_REQUEST: 'posts/toggleLikeRequest',
   TOGGLE_LIKE_SUCCESS: 'posts/toggleLikeSuccess',
-  TOGGLE_LIKE_FAILURE: 'posts/toggleLikeFailure'
+  TOGGLE_LIKE_FAILURE: 'posts/toggleLikeFailure',
+  ADD_COMMENT_REQUEST: 'posts/addCommentRequest',
+  ADD_COMMENT_SUCCESS: 'posts/addCommentSuccess',
+  ADD_COMMENT_FAILURE: 'posts/addCommentFailure',
+  UPDATE_COMMENT_REQUEST: 'posts/updateCommentRequest',
+  UPDATE_COMMENT_SUCCESS: 'posts/updateCommentSuccess',
+  UPDATE_COMMENT_FAILURE: 'posts/updateCommentFailure',
+  DELETE_COMMENT_REQUEST: 'posts/deleteCommentRequest',
+  DELETE_COMMENT_SUCCESS: 'posts/deleteCommentSuccess',
+  DELETE_COMMENT_FAILURE: 'posts/deleteCommentFailure'
 }
 
 export const fetchPosts = (queryParams = {}) => {
@@ -52,4 +60,19 @@ export const fetchUserPosts = (userId) => {
 export const toggleLike = (postId, optimisticUpdate) => ({
   type: POST_ACTIONS.TOGGLE_LIKE_REQUEST,
   payload: { postId, optimisticUpdate }
+})
+
+export const addComment = (postId, commentData) => ({
+  type: POST_ACTIONS.ADD_COMMENT_REQUEST,
+  payload: { postId, commentData }
+})
+
+export const updateComment = (postId, commentId, commentData) => ({
+  type: POST_ACTIONS.UPDATE_COMMENT_REQUEST,
+  payload: { postId, commentId, commentData }
+})
+
+export const deleteComment = (postId, commentId) => ({
+  type: POST_ACTIONS.DELETE_COMMENT_REQUEST,
+  payload: { postId, commentId }
 })

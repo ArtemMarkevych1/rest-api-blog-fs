@@ -103,6 +103,48 @@ const postSlice = createSlice({
     },
     toggleLikeFailure: (state, action) => {
       state.error = action.payload
+    },
+    addCommentRequest: (state) => {
+      state.error = null
+    },
+    addCommentSuccess: (state, action) => {
+      const { postId, comment } = action.payload
+      const postIndex = state.items.findIndex(post => post._id === postId)
+      if (postIndex !== -1) {
+        state.items[postIndex].comments.push(comment)
+      }
+    },
+    addCommentFailure: (state, action) => {
+      state.error = action.payload
+    },
+    updateCommentRequest: (state) => {
+      state.error = null
+    },
+    updateCommentSuccess: (state, action) => {
+      const { postId, commentId, updatedComment } = action.payload
+      const postIndex = state.items.findIndex(post => post._id === postId)
+      if (postIndex !== -1) {
+        const commentIndex = state.items[postIndex].comments.findIndex(comment => comment._id === commentId)
+        if (commentIndex !== -1) {
+          state.items[postIndex].comments[commentIndex] = updatedComment
+        }
+      }
+    },
+    updateCommentFailure: (state, action) => {
+      state.error = action.payload
+    },
+    deleteCommentRequest: (state) => {
+      state.error = null
+    },
+    deleteCommentSuccess: (state, action) => {
+      const { postId, commentId } = action.payload
+      const postIndex = state.items.findIndex(post => post._id === postId)
+      if (postIndex !== -1) {
+        state.items[postIndex].comments = state.items[postIndex].comments.filter(comment => comment._id !== commentId)
+      }
+    },
+    deleteCommentFailure: (state, action) => {
+      state.error = action.payload
     }
   }
 })
@@ -126,7 +168,16 @@ export const {
   fetchUserPostsFailure,
   toggleLikeRequest,
   toggleLikeSuccess,
-  toggleLikeFailure
+  toggleLikeFailure,
+  addCommentRequest,
+  addCommentSuccess,
+  addCommentFailure,
+  updateCommentRequest,
+  updateCommentSuccess,
+  updateCommentFailure,
+  deleteCommentRequest,
+  deleteCommentSuccess,
+  deleteCommentFailure
 } = postSlice.actions
 
 export default postSlice.reducer 

@@ -2,18 +2,54 @@ import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import { format, parseISO } from 'date-fns'
 import { useState } from 'react'
+import { postService } from '../services/api'
 
 function PostCard({ post, onEdit, onDelete, onToggleLike, fullView }) {
   const { user } = useSelector(state => state.auth)
-  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
   const [showTooltip, setShowTooltip] = useState(false)
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
+  const [commentText, setCommentText] = useState('')
+  const [editingCommentId, setEditingCommentId] = useState(null)
+  const [editingCommentText, setEditingCommentText] = useState('')
 
   const formatDate = (dateString) => {
     try {
       const date = parseISO(dateString)
       return format(date, 'MMMM d, yyyy')
     } catch (error) {
-      return error.message
+      return  error.message
+    }
+  }
+
+  const handleAddComment = async () => {
+    if (!commentText.trim()) return
+    try {
+      await postService.addComment(post._id, { content: commentText })
+      setCommentText('')
+      // Refresh post data or update state to include new comment
+    } catch (error) {
+      console.error('Error adding comment:', error)
+    }
+  }
+
+  const handleEditComment = async (commentId) => {
+    if (!editingCommentText.trim()) return
+    try {
+      await postService.updateComment(post._id, commentId, { content: editingCommentText })
+      setEditingCommentId(null)
+      setEditingCommentText('')
+      // Refresh post data or update state to reflect edited comment
+    } catch (error) {
+      console.error('Error editing comment:', error)
+    }
+  }
+
+  const handleDeleteComment = async (commentId) => {
+    try {
+      await postService.deleteComment(post._id, commentId)
+      // Refresh post data or update state to remove deleted comment
+    } catch (error) {
+      console.error('Error deleting comment:', error)
     }
   }
 
@@ -25,7 +61,7 @@ function PostCard({ post, onEdit, onDelete, onToggleLike, fullView }) {
   }
 
   return (
-    <article className="relative bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
+    <article className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
       {post.image && (
         <div className="aspect-w-16 aspect-h-9">
           <img
@@ -92,7 +128,7 @@ function PostCard({ post, onEdit, onDelete, onToggleLike, fullView }) {
                   </svg>
                   <span className="font-medium">{post.likesCount || 0}</span>
                 </button>
-              
+
                 {showTooltip && (
                   <div 
                     className="absolute p-2 bg-white border border-gray-200 rounded-md shadow-lg"
@@ -107,7 +143,6 @@ function PostCard({ post, onEdit, onDelete, onToggleLike, fullView }) {
                     </ul>
                   </div>
                 )}
-              
               </div>
             )}
           </div>
@@ -129,6 +164,73 @@ function PostCard({ post, onEdit, onDelete, onToggleLike, fullView }) {
             </div>
           )}
         </div>
+
+        {/* Comments Section */}
+        <div className="mt-4">
+          <h4 className="text-lg font-semibold text-gray-900">Comments</h4>
+          <div className="mt-2">
+            {post.comments && post.comments.length > 0 && post.comments.map(comment => (
+              <div key={comment._id} className="flex items-start space-x-2 mb-2">
+                <div className="flex-1">
+                  {editingCommentId === comment._id ? (
+                    <input
+                      type="text"
+                      value={editingCommentText}
+                      onChange={(e) => setEditingCommentText(e.target.value)}
+                      className="w-full border border-gray-300 rounded-md p-2"
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-700">{comment.content}</p>
+                  )}
+                  <p className="text-xs text-gray-500">by {comment.createdBy.username} on {formatDate(comment.createdAt)}</p>
+                </div>
+                {user && user._id === comment.createdBy._id && (
+                  <div className="flex space-x-1">
+                    {editingCommentId === comment._id ? (
+                      <button
+                        onClick={() => handleEditComment(comment._id)}
+                        className="text-blue-500 hover:underline"
+                      >
+                        Save
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setEditingCommentId(comment._id)
+                          setEditingCommentText(comment.content)
+                        }}
+                        className="text-blue-500 hover:underline"
+                      >
+                        Edit
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleDeleteComment(comment._id)}
+                      className="text-red-500 hover:underline"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="mt-2">
+            <input
+              type="text"
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              placeholder="Add a comment..."
+              className="w-full border border-gray-300 rounded-md p-2"
+            />
+            <button
+              onClick={handleAddComment}
+              className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md"
+            >
+              Add Comment
+            </button>
+          </div>
+        </div>
       </div>
     </article>
   )
@@ -148,10 +250,15 @@ PostCard.propTypes = {
     }),
     likes: PropTypes.arrayOf(PropTypes.string),
     likesCount: PropTypes.number,
-    likesDetails: PropTypes.arrayOf(PropTypes.shape({
-      userId: PropTypes.string.isRequired,
-      username: PropTypes.string.isRequired,
-      date: PropTypes.string.isRequired
+    likedUsernames: PropTypes.arrayOf(PropTypes.string),
+    comments: PropTypes.arrayOf(PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+      content: PropTypes.string.isRequired,
+      createdBy: PropTypes.shape({
+        _id: PropTypes.string.isRequired,
+        username: PropTypes.string.isRequired
+      }),
+      createdAt: PropTypes.string.isRequired
     }))
   }).isRequired,
   onEdit: PropTypes.func,

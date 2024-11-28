@@ -11,6 +11,12 @@ import {
   fetchPostsRequest,
   toggleLikeSuccess,
   toggleLikeFailure,
+  addCommentSuccess,
+  addCommentFailure,
+  updateCommentSuccess,
+  updateCommentFailure,
+  deleteCommentSuccess,
+  deleteCommentFailure
 } from '../reducers/postReducer'
 import { fetchUserProfile } from '../actions/userActions'
 // Selector to get current URL params from state
@@ -109,6 +115,36 @@ function* toggleLikeSaga(action) {
   }
 }
 
+function* addCommentSaga(action) {
+  try {
+    const { postId, commentData } = action.payload
+    const response = yield call(postService.addComment, postId, commentData)
+    yield put(addCommentSuccess({ postId, comment: response.data }))
+  } catch (error) {
+    yield put(addCommentFailure(error.message))
+  }
+}
+
+function* updateCommentSaga(action) {
+  try {
+    const { postId, commentId, commentData } = action.payload
+    const response = yield call(postService.updateComment, postId, commentId, commentData)
+    yield put(updateCommentSuccess({ postId, commentId, updatedComment: response.data }))
+  } catch (error) {
+    yield put(updateCommentFailure(error.message))
+  }
+}
+
+function* deleteCommentSaga(action) {
+  try {
+    const { postId, commentId } = action.payload
+    yield call(postService.deleteComment, postId, commentId)
+    yield put(deleteCommentSuccess({ postId, commentId }))
+  } catch (error) {
+    yield put(deleteCommentFailure(error.message))
+  }
+}
+
 export function* watchPosts() {
     yield takeLatest(POST_ACTIONS.FETCH_POSTS_REQUEST, fetchPostsSaga)
     yield takeLatest(POST_ACTIONS.CREATE_POST_REQUEST, createPostSaga)
@@ -116,4 +152,7 @@ export function* watchPosts() {
     yield takeLatest(POST_ACTIONS.DELETE_POST_REQUEST, deletePost)
     yield takeLatest(POST_ACTIONS.FETCH_USER_POSTS_REQUEST, fetchUserPosts),
     yield takeLatest(POST_ACTIONS.TOGGLE_LIKE_REQUEST, toggleLikeSaga)
+    yield takeLatest(POST_ACTIONS.ADD_COMMENT_REQUEST, addCommentSaga)
+    yield takeLatest(POST_ACTIONS.UPDATE_COMMENT_REQUEST, updateCommentSaga)
+    yield takeLatest(POST_ACTIONS.DELETE_COMMENT_REQUEST, deleteCommentSaga)
 } 

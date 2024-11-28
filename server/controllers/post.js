@@ -206,11 +206,95 @@ const toggleLike = async (req, res) => {
     }
 }
 
+// Add a comment to a post
+const addComment = async (req, res) => {
+    try {
+        const postId = req.params.postId
+        const { content } = req.body
+        const userId = req.user._id
+
+        const post = await Post.findById(postId)
+        if (!post) {
+
+            return res.status(404).json({
+                success: false,
+                message: 'Post not found'
+            })
+        }
+
+        post.comments.push({ content, createdBy: userId })
+        await post.save()
+
+        res.json({
+            success: true,
+            message: 'Comment added successfully',
+            data: post
+        })
+    } catch (error) {
+        console.error('Add comment error:', error)
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Error adding comment'
+        })
+    }
+}
+
+const updateComment = async (req, res) => {
+    try {
+        const { postId, commentId } = req.params    
+        const { content } = req.body
+
+        const post = await Post.findById(postId)
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: 'Post not found'
+            })
+        }
+        post.comments.find(comment => comment._id.toString() === commentId).content = content
+        await post.save()
+
+        res.json({
+            success: true,
+            message: 'Comment updated successfully'
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+// Delete a comment
+const deleteComment = async (req, res, next) => {
+    try {
+        const { postId, commentId } = req.params
+        const post = await Post.findById(postId)
+        if (!post) {
+            return res.status(404).json({
+                success: false,
+                message: 'Post not found'
+            })
+        }
+
+        post.comments = post.comments.filter(comment => comment._id.toString() !== commentId)
+        await post.save()
+
+        res.json({
+            success: true,
+            message: 'Comment deleted successfully'
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
 module.exports = {
     createPost,
     getAllPosts,
     getPostById,
     updatePost,
     deletePost,
-    toggleLike
+    toggleLike,
+    addComment,
+    updateComment,
+    deleteComment
 };

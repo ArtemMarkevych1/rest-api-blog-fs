@@ -91,6 +91,18 @@ class PostService {
   async toggleLike(postId) {
     return await axiosInstance.post(`/post/${postId}/like`)
   }
+
+  async addComment(postId, commentData) {
+    return await axiosInstance.post(`/post/${postId}/comment`, commentData)
+  }
+
+  async updateComment(postId, commentId, commentData) {
+    return await axiosInstance.put(`/post/${postId}/comment/${commentId}`, commentData)
+  }
+
+  async deleteComment(postId, commentId) {
+    return await axiosInstance.delete(`/post/${postId}/comment/${commentId}`)
+  }
 }
 
 class UserService {
