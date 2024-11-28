@@ -268,10 +268,17 @@ const deleteComment = async (req, res, next) => {
     try {
         const { postId, commentId } = req.params
         const post = await Post.findById(postId)
+        const comment = post.comments.find(comment => comment._id.toString() === commentId)
         if (!post) {
             return res.status(404).json({
                 success: false,
                 message: 'Post not found'
+            })
+        }
+        if (!comment) {
+            return res.status(404).json({
+                success: false,
+                message: 'Comment not found'
             })
         }
 

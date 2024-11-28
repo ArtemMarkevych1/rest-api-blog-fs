@@ -16,7 +16,7 @@ import {
   updateCommentSuccess,
   updateCommentFailure,
   deleteCommentSuccess,
-  deleteCommentFailure
+  deleteCommentFailure,
 } from '../reducers/postReducer'
 import { fetchUserProfile } from '../actions/userActions'
 // Selector to get current URL params from state
@@ -45,6 +45,21 @@ function* fetchPostsSaga(action) {
   }
 }
 
+function* fetchPostById(action) {
+  try {
+    const response = yield call(postService.getPost, action.payload)
+    yield put({
+      type: POST_ACTIONS.FETCH_POST_BY_ID_SUCCESS,
+      payload: response
+    })
+  } catch (error) {
+    yield put({
+      type: POST_ACTIONS.FETCH_POST_BY_ID_FAILURE,
+      payload: error.message
+    })
+  }
+}
+
 function* createPostSaga(action) {
   try {
     const response = yield call(postService.createPost, action.payload)
@@ -52,7 +67,6 @@ function* createPostSaga(action) {
       type: POST_ACTIONS.CREATE_POST_SUCCESS,
       payload: response
     })
-    
     // After successful post creation, fetch posts with current URL params
     const currentParams = yield select(getCurrentUrlParams)
     yield put({
@@ -70,34 +84,34 @@ function* createPostSaga(action) {
 }
 
 function* updatePost(action) {
-    try {
-        const { id, data } = action.payload
-        const response = yield call(postService.updatePost, id, data)
-        yield put(updatePostSuccess(response.data))
-        yield put(fetchPostsRequest())
-        yield put(fetchUserProfile())
-    } catch (error) {
-        yield put(updatePostFailure(error.message))
-    }
+  try {
+    const { id, data } = action.payload
+    const response = yield call(postService.updatePost, id, data)
+    yield put(updatePostSuccess(response.data))
+    yield put(fetchPostsRequest())
+    yield put(fetchUserProfile())
+  } catch (error) {
+    yield put(updatePostFailure(error.message))
+  }
 }
 
 function* deletePost(action) {
-    try {
-        yield call(postService.deletePost, action.payload)
-        yield put(deletePostSuccess(action.payload))
-        yield put(fetchUserProfile())
-    } catch (error) {
-        yield put(deletePostFailure(error.message))
-    }
+  try {
+    yield call(postService.deletePost, action.payload)
+    yield put(deletePostSuccess(action.payload))
+    yield put(fetchUserProfile())
+  } catch (error) {
+    yield put(deletePostFailure(error.message))
+  }
 }
 
 function* fetchUserPosts(action) {
-    try {
-        const response = yield call(postService.getUserPosts, action.payload)
-        yield put(fetchUserPostsSuccess(response.data))
-    } catch (error) {
-        yield put(fetchUserPostsFailure(error.message))
-    }
+  try {
+    const response = yield call(postService.getUserPosts, action.payload)
+    yield put(fetchUserPostsSuccess(response.data))
+  } catch (error) {
+    yield put(fetchUserPostsFailure(error.message))
+  }
 }
 
 function* toggleLikeSaga(action) {
@@ -120,6 +134,7 @@ function* addCommentSaga(action) {
     const { postId, commentData } = action.payload
     const response = yield call(postService.addComment, postId, commentData)
     yield put(addCommentSuccess({ postId, comment: response.data }))
+    yield put(fetchPostsRequest())
   } catch (error) {
     yield put(addCommentFailure(error.message))
   }
@@ -130,6 +145,7 @@ function* updateCommentSaga(action) {
     const { postId, commentId, commentData } = action.payload
     const response = yield call(postService.updateComment, postId, commentId, commentData)
     yield put(updateCommentSuccess({ postId, commentId, updatedComment: response.data }))
+    yield put(fetchPostsRequest())
   } catch (error) {
     yield put(updateCommentFailure(error.message))
   }
@@ -140,19 +156,21 @@ function* deleteCommentSaga(action) {
     const { postId, commentId } = action.payload
     yield call(postService.deleteComment, postId, commentId)
     yield put(deleteCommentSuccess({ postId, commentId }))
+    yield put(fetchPostsRequest())
   } catch (error) {
     yield put(deleteCommentFailure(error.message))
   }
 }
 
 export function* watchPosts() {
-    yield takeLatest(POST_ACTIONS.FETCH_POSTS_REQUEST, fetchPostsSaga)
-    yield takeLatest(POST_ACTIONS.CREATE_POST_REQUEST, createPostSaga)
-    yield takeLatest(POST_ACTIONS.UPDATE_POST_REQUEST, updatePost)
-    yield takeLatest(POST_ACTIONS.DELETE_POST_REQUEST, deletePost)
-    yield takeLatest(POST_ACTIONS.FETCH_USER_POSTS_REQUEST, fetchUserPosts),
-    yield takeLatest(POST_ACTIONS.TOGGLE_LIKE_REQUEST, toggleLikeSaga)
-    yield takeLatest(POST_ACTIONS.ADD_COMMENT_REQUEST, addCommentSaga)
-    yield takeLatest(POST_ACTIONS.UPDATE_COMMENT_REQUEST, updateCommentSaga)
-    yield takeLatest(POST_ACTIONS.DELETE_COMMENT_REQUEST, deleteCommentSaga)
+  yield takeLatest(POST_ACTIONS.FETCH_POSTS_REQUEST, fetchPostsSaga)
+  yield takeLatest(POST_ACTIONS.FETCH_POST_BY_ID_REQUEST, fetchPostById)
+  yield takeLatest(POST_ACTIONS.CREATE_POST_REQUEST, createPostSaga)
+  yield takeLatest(POST_ACTIONS.UPDATE_POST_REQUEST, updatePost)
+  yield takeLatest(POST_ACTIONS.DELETE_POST_REQUEST, deletePost)
+  yield takeLatest(POST_ACTIONS.FETCH_USER_POSTS_REQUEST, fetchUserPosts),
+  yield takeLatest(POST_ACTIONS.TOGGLE_LIKE_REQUEST, toggleLikeSaga)
+  yield takeLatest(POST_ACTIONS.ADD_COMMENT_REQUEST, addCommentSaga)
+  yield takeLatest(POST_ACTIONS.UPDATE_COMMENT_REQUEST, updateCommentSaga)
+  yield takeLatest(POST_ACTIONS.DELETE_COMMENT_REQUEST, deleteCommentSaga)
 } 

@@ -10,6 +10,9 @@ export const POST_ACTIONS = {
   FETCH_POSTS_REQUEST: 'posts/fetchPostsRequest',
   FETCH_POSTS_SUCCESS: 'posts/fetchPostsSuccess',
   FETCH_POSTS_FAILURE: 'posts/fetchPostsFailure',
+  FETCH_POST_BY_ID_REQUEST: 'posts/fetchPostByIdRequest',
+  FETCH_POST_BY_ID_SUCCESS: 'posts/fetchPostByIdSuccess',
+  FETCH_POST_BY_ID_FAILURE: 'posts/fetchPostByIdFailure',
   CREATE_POST_REQUEST: 'posts/createPostRequest',
   CREATE_POST_SUCCESS: 'posts/createPostSuccess',
   CREATE_POST_FAILURE: 'posts/createPostFailure',
@@ -33,20 +36,26 @@ export const POST_ACTIONS = {
   UPDATE_COMMENT_FAILURE: 'posts/updateCommentFailure',
   DELETE_COMMENT_REQUEST: 'posts/deleteCommentRequest',
   DELETE_COMMENT_SUCCESS: 'posts/deleteCommentSuccess',
-  DELETE_COMMENT_FAILURE: 'posts/deleteCommentFailure'
+  DELETE_COMMENT_FAILURE: 'posts/deleteCommentFailure',
+  FETCH_POST_BY_ID: 'posts/fetchPostById'
 }
 
 export const fetchPosts = (queryParams = {}) => {
   return fetchPostsRequest(queryParams)
 }
 
+export const fetchPostById = (postId) => ({
+  type: POST_ACTIONS.FETCH_POST_BY_ID,
+  payload: postId
+})
+
 export const createPost = (postData) => {
   return createPostRequest(postData)
 }
 
-export const updatePost = (payload) => ({
+export const updatePost = (postId, postData) => ({
   type: POST_ACTIONS.UPDATE_POST_REQUEST,
-  payload
+  payload: { postId, postData }
 })
 
 export const deletePost = (postId) => {

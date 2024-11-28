@@ -11,7 +11,8 @@ const initialState = {
     hasPrev: false
   },
   loading: false,
-  error: null
+  error: null,
+  currentPost: null
 }
 
 const postSlice = createSlice({
@@ -28,6 +29,18 @@ const postSlice = createSlice({
       state.pagination = action.payload.pagination
     },
     fetchPostsFailure: (state, action) => {
+      state.loading = false
+      state.error = action.payload
+    },
+    fetchPostByIdRequest: (state) => {
+      state.loading = true
+      state.error = null
+    },
+    fetchPostByIdSuccess: (state, action) => {
+      state.loading = false
+      state.item = action.payload
+    },
+    fetchPostByIdFailure: (state, action) => {
       state.loading = false
       state.error = action.payload
     },
@@ -52,11 +65,10 @@ const postSlice = createSlice({
     },
     updatePostSuccess: (state, action) => {
       state.loading = false
-      if (action.payload && action.payload._id) {
-        const index = state.items.findIndex(post => post._id === action.payload._id)
-        if (index !== -1) {
-          state.items[index] = action.payload
-        }
+      const updatedPost = action.payload
+      const index = state.items.findIndex(post => post._id === updatedPost._id)
+      if (index !== -1) {
+        state.items[index] = updatedPost
       }
     },
     updatePostFailure: (state, action) => {
@@ -145,6 +157,9 @@ const postSlice = createSlice({
     },
     deleteCommentFailure: (state, action) => {
       state.error = action.payload
+    },
+    fetchPostById: (state, action) => {
+      state.currentPost = state.items.find(post => post._id === action.payload)
     }
   }
 })
@@ -153,6 +168,9 @@ export const {
   fetchPostsRequest,
   fetchPostsSuccess,
   fetchPostsFailure,
+  fetchPostByIdRequest,
+  fetchPostByIdSuccess,
+  fetchPostByIdFailure,
   setCurrentCategory,
   createPostRequest,
   createPostSuccess,
@@ -177,7 +195,8 @@ export const {
   updateCommentFailure,
   deleteCommentRequest,
   deleteCommentSuccess,
-  deleteCommentFailure
+  deleteCommentFailure,
+  fetchPostById
 } = postSlice.actions
 
 export default postSlice.reducer 
