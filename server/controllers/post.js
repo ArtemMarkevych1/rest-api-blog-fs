@@ -209,19 +209,19 @@ const toggleLike = async (req, res) => {
 // Add a comment to a post
 const addComment = async (req, res) => {
     try {
-        const postId = req.params.postId
+        const { postId } = req.params
         const { content } = req.body
         const userId = req.user._id
 
         const post = await Post.findById(postId)
         if (!post) {
-
             return res.status(404).json({
                 success: false,
                 message: 'Post not found'
             })
         }
 
+        // Add the comment to the post
         post.comments.push({ content, createdBy: userId })
         await post.save()
 
@@ -241,7 +241,7 @@ const addComment = async (req, res) => {
 
 const updateComment = async (req, res) => {
     try {
-        const { postId, commentId } = req.params    
+        const { postId, commentId } = req.params
         const { content } = req.body
 
         const post = await Post.findById(postId)
